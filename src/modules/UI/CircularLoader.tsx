@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 function CircularProgressWithLabel(
-  props: CircularProgressProps & { value: number }
+  props: CircularProgressProps & { value: number },
 ) {
   return (
     <Box sx={{ position: "relative", display: "inline-flex" }}>
@@ -39,7 +39,7 @@ export default function CircularWithValueLabel() {
   React.useEffect(() => {
     const timer = setInterval(() => {
       setProgress((prevProgress) =>
-        prevProgress >= 100 ? 0 : prevProgress + 10
+        prevProgress >= 100 ? 0 : prevProgress + 10,
       );
     }, 200);
     return () => {

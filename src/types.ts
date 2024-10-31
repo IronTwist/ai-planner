@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // types.ts
 export type Action<T = any> = {
-    type: string;
-    payload?: T;
-  };
-  
+  type: string;
+  payload?: T;
+};
+
 export type Reducer<S, A extends Action> = (state: S, action: A) => S;
 
 export interface AuthState {
@@ -12,8 +12,8 @@ export interface AuthState {
   user: {
     email: string;
     firstName: string;
-  }
-  error: null
+  };
+  error: null;
 }
 
 export type Note = {
@@ -21,23 +21,22 @@ export type Note = {
   title: string;
   content: string;
   date: string;
-}
+};
 
 export type StoreType = {
   auth: {
-    isAuthenticated: boolean,
+    isAuthenticated: boolean;
     user: {
-      userName: string,
-      email: string
-    },
-    token: string,
-  },
-  notes: Note[] | [],
+      userName: string;
+      email: string;
+    };
+    token: string;
+  };
+  notes: Note[] | [];
 };
 
 export type User = {
-  id: string,
-  userName: string,
-  email: string
-}
-  
+  id: string;
+  userName: string;
+  email: string;
+};
