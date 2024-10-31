@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { loginUser } from "@/api/test";
 import { Input } from "@/modules/common/input";
 import { Button } from "@/modules/common/button";
-import { AppDispatch, RootState } from "@/store/store";
+import { AppDispatch } from "@/store/store";
 import {
   logIn,
   logOut,

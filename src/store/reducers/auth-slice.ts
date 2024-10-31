@@ -36,14 +36,19 @@ export const auth = createSlice({
       return {
         ...state,
         loading: action.payload,
-      }
+      };
     },
-    logIn: (_state, action: PayloadAction<{ user: {
-      uid: string;
-      userName: string;
-      email: string;
-  }; token: string }>) => {
-    
+    logIn: (
+      _state,
+      action: PayloadAction<{
+        user: {
+          uid: string;
+          userName: string;
+          email: string;
+        };
+        token: string;
+      }>,
+    ) => {
       return {
         loading: false,
         data: {
