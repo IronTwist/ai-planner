@@ -5,7 +5,7 @@ export const loginUser = async (credentials: {
   password: string;
 }) => {
   const { email } = credentials;
-  return new Promise((resolve) =>
+  return new Promise(resolve =>
     setTimeout(
       () =>
         resolve({
@@ -13,7 +13,7 @@ export const loginUser = async (credentials: {
           status: 200,
           data: {
             user: {
-              userName: email.split("@")[0],
+              userName: email.split('@')[0],
               email,
             },
             token: Math.floor(Math.random() * 16).toString(16),

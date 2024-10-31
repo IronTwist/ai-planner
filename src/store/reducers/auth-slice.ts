@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type InitialState = {
   loading: boolean;
@@ -18,18 +18,18 @@ const initialState = {
   loading: false,
   data: {
     user: {
-      uid: "",
-      userName: "",
-      email: "",
+      uid: '',
+      userName: '',
+      email: '',
       isAuth: false,
     },
-    token: "",
+    token: '',
   },
   error: null,
 } as InitialState;
 
 export const auth = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
     loading: (state, action: PayloadAction<boolean>) => {
@@ -53,7 +53,7 @@ export const auth = createSlice({
         loading: false,
         data: {
           user: {
-            uid: "234234324dawd",
+            uid: '234234324dawd',
             userName: action.payload.user.userName,
             email: action.payload.user.email,
             isAuth: true,
