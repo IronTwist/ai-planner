@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// types.ts
+// import firebase from "./firebase";
+
 export type Action<T = any> = {
   type: string;
   payload?: T;
@@ -33,10 +34,4 @@ export type StoreType = {
     token: string;
   };
   notes: Note[] | [];
-};
-
-export type User = {
-  id: string;
-  userName: string;
-  email: string;
 };
