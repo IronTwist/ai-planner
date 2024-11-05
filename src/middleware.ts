@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserInfo, setCache } from './service/sessions';
+import { getUserInfo, setCache } from './session/server-sessions';
 
 export default async function middlewares(req: NextRequest) {
   let isLogedIn = false;
@@ -9,7 +9,7 @@ export default async function middlewares(req: NextRequest) {
   const userData = await getUserInfo();
 
   if (userData?.uid && userData?.token) {
-    console.log('middleware session', userData);
+    // TODO: use cookies to save data in cache for server side
     setCache('userName', userData?.userName);
     setCache('email', userData?.email);
 

@@ -10,6 +10,11 @@ type InitialState = {
     email: string | null;
     refreshToken: string | null;
     newAccount: boolean;
+    token: string | null;
+    metadata: {
+      createdAt: string;
+      lastLoginAt: string;
+    };
   } | null;
   error: string | null;
 };
@@ -18,9 +23,15 @@ const initialState = {
   loading: false,
   user: {
     uid: null,
+    userName: null,
     email: null,
     refreshToken: null,
     newAccount: false,
+    token: null,
+    metadata: {
+      createdAt: '',
+      lastLoginAt: '',
+    },
   },
   error: null,
 } as InitialState;
