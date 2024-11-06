@@ -4,8 +4,6 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logOut } from '@/store/reducers/auth-slice';
 import { AppDispatch } from '@/store/store';
 import Link from 'next/link';
-import firebase from '@/service/client/firebase';
-import { deleteCookie } from '@/session/client-session';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/modules/UI/navigation/navigation';
 
