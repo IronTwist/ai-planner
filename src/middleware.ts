@@ -16,7 +16,7 @@ export default async function middlewares(req: NextRequest) {
     isLogedIn = true;
   }
 
-  const protectedRoutes = ['/dashboard', '/profile', '/', 'api/serve'];
+  const protectedRoutes = ['/dashboard', '/profile', '/'];
 
   if (!isLogedIn && protectedRoutes.includes(req.nextUrl.pathname)) {
     console.log('req.nextUrl.pathname', req.nextUrl.pathname);

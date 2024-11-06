@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-// import firebase from '@/firebase';
+import firebase from '@/service/client/firebase';
 import { UserSignUpResponseType } from '@/app/auth/sign-up/page';
+import { deleteCookie } from '@/session/client-session';
 
 type InitialState = {
   loading: boolean;
@@ -89,6 +90,9 @@ export const auth = createSlice({
       };
     },
     logOut: () => {
+      firebase.auth().signOut();
+      deleteCookie('ai-planner-session');
+
       return initialState;
     },
   },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Input } from '@/modules/common/input';
 import { Button } from '@/modules/common/button';
@@ -22,7 +22,7 @@ export type UserMetadataType = { createdAt: string; lastLoginAt: string };
 
 export default function Login() {
   const router = useRouter();
-  // const user = useAppSelector(state => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
   const loading = useAppSelector(state => state.auth.loading);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -71,9 +71,9 @@ export default function Login() {
               user: userData,
             }),
           );
-        }
 
-        router.push('/');
+          router.push('/');
+        }
       })
       .catch(error => {
         if (error.message === 'NEXT_REDIRECT') {
@@ -84,6 +84,12 @@ export default function Login() {
         router.push('/');
       });
   };
+
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   return (
     <div className='flex justify-center items-center p-8'>
