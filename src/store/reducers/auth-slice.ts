@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 // import firebase from '@/firebase';
-import { UserSignUpResponse } from '@/app/auth/sign-up/page';
+import { UserSignUpResponseType } from '@/app/auth/sign-up/page';
 
 type InitialState = {
   loading: boolean;
@@ -46,7 +46,10 @@ export const auth = createSlice({
         loading: action.payload,
       };
     },
-    signUp: (state, action: PayloadAction<{ user: UserSignUpResponse }>) => {
+    signUp: (
+      state,
+      action: PayloadAction<{ user: UserSignUpResponseType }>,
+    ) => {
       return {
         ...state,
         loading: false,
@@ -54,7 +57,10 @@ export const auth = createSlice({
         error: null,
       };
     },
-    setUser: (state, action: PayloadAction<{ user: UserSignUpResponse }>) => {
+    setUser: (
+      state,
+      action: PayloadAction<{ user: UserSignUpResponseType }>,
+    ) => {
       return {
         ...state,
         loading: false,
@@ -73,7 +79,7 @@ export const auth = createSlice({
     logIn: (
       _state,
       action: PayloadAction<{
-        user: UserSignUpResponse;
+        user: UserSignUpResponseType;
       }>,
     ) => {
       return {

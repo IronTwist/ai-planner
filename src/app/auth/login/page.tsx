@@ -7,7 +7,6 @@ import { Button } from '@/modules/common/button';
 import { AppDispatch } from '@/store/store';
 import {
   logIn,
-  logOut,
   authError,
   loading as loadingSlice,
 } from '@/store/reducers/auth-slice';
@@ -16,14 +15,14 @@ import Link from 'next/link';
 import firebase from '@/service/client/firebase';
 import { useRouter } from 'next/navigation';
 import { setCookie } from '@/session/client-session';
-import { firestore } from '@/service/client/firebase';
-import { addDoc, collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
+// import { firestore } from '@/service/client/firebase';
+// import { addDoc, collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export type UserMetadataType = { createdAt: string; lastLoginAt: string };
 
 export default function Login() {
   const router = useRouter();
-  const user = useAppSelector(state => state.auth.user);
+  // const user = useAppSelector(state => state.auth.user);
   const loading = useAppSelector(state => state.auth.loading);
   const dispatch = useDispatch<AppDispatch>();
 

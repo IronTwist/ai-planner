@@ -15,7 +15,7 @@ import Link from 'next/link';
 import firebase from '../../../service/client/firebase';
 import { useRouter } from 'next/navigation';
 
-export type UserSignUpResponse = {
+export type UserSignUpResponseType = {
   uid: string | null;
   userName: string | null;
   email: string | null;
@@ -28,7 +28,9 @@ export type UserSignUpResponse = {
   };
 } | null;
 
-export default function Login() {
+export type UserSignUpResponseTypeKeys = keyof UserSignUpResponseType;
+
+export default function SignUp() {
   const error = useAppSelector(state => state.auth.error);
   const loading = useAppSelector(state => state.auth.loading);
   const dispatch = useDispatch<AppDispatch>();
@@ -67,14 +69,14 @@ export default function Login() {
         const token = await data.user?.getIdToken(false);
         const metadata = data.user?.metadata;
 
-        const userData: UserSignUpResponse = {
+        const userData: UserSignUpResponseType = {
           uid: data.user?.uid || '',
           userName: data.user?.email?.split('@')[0] || '',
           email: data.user?.email || '',
           refreshToken: data.user?.refreshToken || '',
           newAccount: true,
           token: token as string,
-          metadata: metadata as any,
+          metadata: metadata as UserSignUpResponseTypeKeys,
         };
 
         dispatch(

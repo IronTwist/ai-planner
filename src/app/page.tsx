@@ -5,7 +5,7 @@ import { logOut } from '@/store/reducers/auth-slice';
 import { AppDispatch } from '@/store/store';
 import Link from 'next/link';
 import firebase from '@/service/client/firebase';
-import { deleteCookie, setCookie } from '@/session/client-session';
+import { deleteCookie } from '@/session/client-session';
 
 export default function Home() {
   const user = useAppSelector(state => state.auth.user);
