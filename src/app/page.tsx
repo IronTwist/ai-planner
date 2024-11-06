@@ -5,17 +5,7 @@ import { logOut } from '@/store/reducers/auth-slice';
 import { AppDispatch } from '@/store/store';
 import Link from 'next/link';
 import firebase from '@/service/client/firebase';
-import { deleteCookie, setCookie } from '@/session/client-session';
-
-firebase.auth().onAuthStateChanged(user => {
-  console.log('User: ----->', user);
-  if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
-    const uid = user.uid;
-    console.log('USer UID: ', uid);
-  }
-});
+import { deleteCookie } from '@/session/client-session';
 
 export default function Home() {
   const user = useAppSelector(state => state.auth.user);
@@ -32,6 +22,7 @@ export default function Home() {
             <Link
               href='/'
               onClick={() => {
+                // TODO: Move this inside reducer
                 firebase.auth().signOut();
                 dispatch(logOut());
                 deleteCookie('ai-planner-session');

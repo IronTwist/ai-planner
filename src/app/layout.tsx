@@ -6,7 +6,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { ReduxProvider } from '@/store/provider';
-import { ApiCallWrapper } from './apiCallWrapper';
+import { ApiCallWrapper } from './authCallWrapper';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',

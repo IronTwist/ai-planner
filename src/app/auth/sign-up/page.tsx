@@ -15,30 +15,22 @@ import Link from 'next/link';
 import firebase from '../../../service/client/firebase';
 import { useRouter } from 'next/navigation';
 
-// export type UserSignUpResponse = {
-//   uid: string;
-//   idToken: string;
-//   email: string;
-//   refreshToken: string;
-//   expiresIn: string;
-//   localId: string;
-//   metadata: {
-//     createdAt: string;
-//     creationTime: string;
-//     lastLoginAt: string;
-//     lastSignInTime: string;
-//   };
-// };
-
-export type UserSignUpResponse = {
-  uid: string;
-  userName: string;
-  email: string;
-  refreshToken: string;
+export type UserSignUpResponseType = {
+  uid: string | null;
+  userName: string | null;
+  email: string | null;
+  refreshToken: string | null;
   newAccount: boolean;
-};
+  token: string | null;
+  metadata: {
+    createdAt: string;
+    lastLoginAt: string;
+  };
+} | null;
 
-export default function Login() {
+export type UserSignUpResponseTypeKeys = keyof UserSignUpResponseType;
+
+export default function SignUp() {
   const error = useAppSelector(state => state.auth.error);
   const loading = useAppSelector(state => state.auth.loading);
   const dispatch = useDispatch<AppDispatch>();
@@ -71,14 +63,20 @@ export default function Login() {
     await firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(data => {
+      .then(async data => {
         console.log('Welcome', data);
-        const userData: UserSignUpResponse = {
+
+        const token = await data.user?.getIdToken(false);
+        const metadata = data.user?.metadata;
+
+        const userData: UserSignUpResponseType = {
           uid: data.user?.uid || '',
           userName: data.user?.email?.split('@')[0] || '',
           email: data.user?.email || '',
           refreshToken: data.user?.refreshToken || '',
           newAccount: true,
+          token: token as string,
+          metadata: metadata as UserSignUpResponseTypeKeys,
         };
 
         dispatch(

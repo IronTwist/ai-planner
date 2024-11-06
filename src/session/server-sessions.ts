@@ -1,14 +1,16 @@
-import { stringify } from 'querystring';
-
 import { cookies } from 'next/headers';
 
 export const setCookies = async (data: { userId: string; token: string }) => {
   const cookieStore = await cookies();
-  cookieStore.set('ai-planner-session', stringify(data), {
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-    sameSite: 'strict',
-    path: '/',
-  });
+  cookieStore.set(
+    'ai-planner-session',
+    new URLSearchParams(data).toString().replace(/\+/g, '%20'),
+    {
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      sameSite: 'strict',
+      path: '/',
+    },
+  );
 };
 
 export const getCookie = async (key: string) => {
@@ -18,7 +20,6 @@ export const getCookie = async (key: string) => {
 };
 
 export const storeUserInfo = async (userId: string, token: string) => {
-  localStorage.setItem('ai-planner-session', stringify({ userId, token }));
   setCookies({ userId, token });
 };
 
@@ -32,10 +33,7 @@ export const getUserInfo = async () => {
   return JSON.parse(session.value);
 };
 
-export const isLoggedIn = () => localStorage.getItem('userId') !== null;
-
 export const clearUserInfo = () => {
-  localStorage.removeItem('ai-planner-session');
   setCookies({ userId: '', token: '' });
 };
 
@@ -74,9 +72,9 @@ export const setCache = (key: CacheKeys, value: string) => {
 
   if (key in cache) {
     if (cache.hasOwnProperty(key)) {
-      // @ts-ignore
+      // @ts-expect-error never will be assignable to string
       cache[key] = value;
-      console.log('cache: ', cache);
+      // console.log('cached: ', cache);
     }
   }
 };
