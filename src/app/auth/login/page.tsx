@@ -12,7 +12,7 @@ export default function Login() {
   const user = useAppSelector(state => state.auth.user);
 
   useEffect(() => {
-    if (user) {
+    if (user?.uid) {
       router.push('/');
     }
   }, [user, router]);
