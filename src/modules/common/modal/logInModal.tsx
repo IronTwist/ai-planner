@@ -1,3 +1,5 @@
+'use client';
+
 import { UserMetadataType } from '@/app/auth/login/page';
 import { setCookie } from '@/session/client-session';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';

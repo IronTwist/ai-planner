@@ -1,3 +1,5 @@
+'use client';
+
 import {
   loading as loadingSlice,
   authError,

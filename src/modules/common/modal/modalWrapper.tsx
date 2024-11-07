@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -27,9 +29,6 @@ export const ModalWrapper = ({ open, children }: ModalWrapperType) => {
     dispatch(closeModal());
   };
 
-  {
-    console.log('modal is open', open, children);
-  }
   return (
     <div>
       <Modal
