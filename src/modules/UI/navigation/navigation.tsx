@@ -56,7 +56,7 @@ function Navigation() {
   const handleSetting = (setting: string) => {
     if (setting === 'Logout') {
       dispatch(logOut());
-      router.push('/');
+      router.push(`${window.location.origin}/`);
     }
   };
 
