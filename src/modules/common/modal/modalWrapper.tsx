@@ -29,9 +29,6 @@ export const ModalWrapper = ({ open, children }: ModalWrapperType) => {
     dispatch(closeModal());
   };
 
-  {
-    console.log('modal is open', open, children);
-  }
   return (
     <div>
       <Modal
