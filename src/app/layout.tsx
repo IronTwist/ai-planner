@@ -6,7 +6,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { ReduxProvider } from '@/store/provider';
-import { ApiCallWrapper } from './authCallWrapper';
+import { AuthCallWrapper } from './authCallWrapper';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -33,9 +33,10 @@ export default function RootLayout({
     <html lang='en'>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ backgroundImage: 'url(/stars.gif)' }}
       >
         <ReduxProvider>
-          <ApiCallWrapper>{children}</ApiCallWrapper>
+          <AuthCallWrapper>{children}</AuthCallWrapper>
         </ReduxProvider>
       </body>
     </html>
