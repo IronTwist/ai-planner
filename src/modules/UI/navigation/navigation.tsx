@@ -18,8 +18,10 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { AppDispatch } from '@/store/store';
 import { logOut } from '@/store/reducers/auth-slice';
 import { useRouter } from 'next/navigation';
+import { openModal } from '@/store/reducers/modal-slice';
+// import { ModalWrapper } from '@/modules/common/modal/modalWrapper';
 
-const pages = ['Notes'];
+const pages = ['Notes', 'Sign Up'];
 const settings = ['Profile', 'Logout'];
 
 function Navigation() {
@@ -40,8 +42,11 @@ function Navigation() {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
+  const handleCloseNavMenu = (page: string) => {
     setAnchorElNav(null);
+    if (page === 'Sign Up') {
+      dispatch(openModal({ name: 'signUpModal' }));
+    }
   };
 
   const handleCloseUserMenu = () => {
@@ -50,7 +55,6 @@ function Navigation() {
 
   const handleSetting = (setting: string) => {
     if (setting === 'Logout') {
-      console.log('You clicked Logout');
       dispatch(logOut());
       router.push('/');
     }
@@ -113,7 +117,7 @@ function Navigation() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map(page => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={() => handleCloseNavMenu(page)}>
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
@@ -133,7 +137,7 @@ function Navigation() {
               <Button
                 key={page}
                 variant='outlined'
-                onClick={handleCloseNavMenu}
+                onClick={() => handleCloseNavMenu(page)}
                 sx={{ my: 2, color: 'black', display: 'block' }}
               >
                 {page}
