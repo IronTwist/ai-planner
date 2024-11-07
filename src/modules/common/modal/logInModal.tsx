@@ -175,7 +175,7 @@ export const LogInModal = () => {
             }),
           );
 
-          router.push('/');
+          router.push(`${window.location.origin}/`);
         }
       })
       .catch(error => {
