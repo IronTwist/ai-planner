@@ -180,11 +180,11 @@ export const LogInModal = () => {
       })
       .catch(error => {
         if (error.message === 'NEXT_REDIRECT') {
-          router.push('/');
+          router.push(`${window.location.origin}/`);
         }
 
         dispatch(authError({ message: error.message }));
-        router.push('/');
+        router.push(`${window.location.origin}/`);
       });
   };
 
