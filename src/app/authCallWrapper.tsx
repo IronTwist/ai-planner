@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser } from '@/store/reducers/auth-slice';
 import { AppDispatch } from '@/store/store';
 import { useEffect } from 'react';
-import { getAuth, getIdTokenResult, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export const AuthCallWrapper = ({
   children,
