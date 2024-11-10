@@ -48,6 +48,10 @@ function Navigation() {
       // Test modal
       dispatch(openModal({ name: 'signUpModal' }));
     }
+
+    if (page === 'Notes') {
+      router.push(`${window.location.origin}/notes`);
+    }
   };
 
   const handleCloseUserMenu = () => {
