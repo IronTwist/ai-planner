@@ -153,7 +153,7 @@ function Navigation() {
                 sx={{
                   my: 2,
                   color: 'black',
-                  display: { xs: 'none', md: 'flex', lg: 'block', xl: 'none' },
+                  display: { xs: 'none', md: 'flex', lg: 'block', xl: 'block' },
                 }}
               >
                 {page}

@@ -10,12 +10,11 @@ export async function GET(req: NextRequest) {
     const decodedToken = await adminAuth.verifyIdToken(token);
     const userId = decodedToken.uid;
 
-    console.log('userId', userId);
-
     const notesRef = adminFirestore
       .collection('notes')
       .doc(userId)
-      .collection('notes');
+      .collection('notes')
+      .orderBy('createdAt', 'desc');
 
     const resp = await notesRef.get();
 
