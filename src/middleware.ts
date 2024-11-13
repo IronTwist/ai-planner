@@ -8,6 +8,8 @@ export default async function middlewares(req: NextRequest) {
 
   const userData = await getUserInfo();
 
+  console.log('\x1b[32m%s\x1b[0m', 'Middleware: ', userData?.email);
+
   if (userData?.uid && userData?.token) {
     // TODO: use cookies to save data in cache for server side if needed
     setCache('userName', userData?.userName);
@@ -16,7 +18,7 @@ export default async function middlewares(req: NextRequest) {
     isLogedIn = true;
   }
 
-  const protectedRoutes = ['/dashboard', '/profile', '/'];
+  const protectedRoutes = ['/', '/dashboard', '/profile', '/notes'];
 
   if (!isLogedIn && protectedRoutes.includes(req.nextUrl.pathname)) {
     console.log('req.nextUrl.pathname', req.nextUrl.pathname);

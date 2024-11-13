@@ -25,6 +25,7 @@ import { useState } from 'react';
 import firebase from '@/service/client/firebase';
 import { loading as userLoading } from '@/store/reducers/auth-slice';
 import { useRouter } from 'next/navigation';
+import { closeModal } from '@/store/reducers/modal-slice';
 
 export function GoogleIcon() {
   return (
@@ -174,6 +175,8 @@ export const LogInModal = () => {
               user: userData,
             }),
           );
+
+          dispatch(closeModal());
 
           router.push(`${window.location.origin}/`);
         }
