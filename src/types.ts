@@ -35,3 +35,16 @@ export type StoreType = {
   };
   notes: Note[] | [];
 };
+
+export type User = {
+  uid: string | null;
+  userName: string | null;
+  email: string | null;
+  refreshToken: string | null;
+  newAccount: boolean;
+  token: string | null;
+  metadata: {
+    createdAt: string;
+    lastLoginAt: string;
+  };
+} | null;

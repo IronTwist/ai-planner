@@ -45,7 +45,12 @@ function Navigation() {
   const handleCloseNavMenu = (page: string) => {
     setAnchorElNav(null);
     if (page === 'Sign Up') {
+      // Test modal
       dispatch(openModal({ name: 'signUpModal' }));
+    }
+
+    if (page === 'Notes') {
+      router.push(`${window.location.origin}/notes`);
     }
   };
 
@@ -132,13 +137,24 @@ function Navigation() {
               height={40}
             />
           </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box
+            className='flex gap-2'
+            sx={{
+              flexGrow: 1,
+              gap: '0.5rem',
+              display: { xs: 'none', lg: 'block', xl: 'none' },
+            }}
+          >
             {pages.map(page => (
               <Button
                 key={page}
                 variant='outlined'
                 onClick={() => handleCloseNavMenu(page)}
-                sx={{ my: 2, color: 'black', display: 'block' }}
+                sx={{
+                  my: 2,
+                  color: 'black',
+                  display: { xs: 'none', md: 'flex', lg: 'block', xl: 'block' },
+                }}
               >
                 {page}
               </Button>

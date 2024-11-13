@@ -25,6 +25,7 @@ import { useState } from 'react';
 import firebase from '@/service/client/firebase';
 import { loading as userLoading } from '@/store/reducers/auth-slice';
 import { useRouter } from 'next/navigation';
+import { closeModal } from '@/store/reducers/modal-slice';
 
 export function GoogleIcon() {
   return (
@@ -137,9 +138,9 @@ export const LogInModal = () => {
   };
 
   const handleSubmit = () => {
-    const invalidInputs = validateInputs();
+    const validInputs = validateInputs();
 
-    if (!invalidInputs || emailError || passwordError) {
+    if (!validInputs) {
       return;
     }
 
@@ -175,6 +176,8 @@ export const LogInModal = () => {
             }),
           );
 
+          dispatch(closeModal());
+
           router.push(`${window.location.origin}/`);
         }
       })
@@ -191,13 +194,22 @@ export const LogInModal = () => {
   return (
     <LogInContainer direction='column' justifyContent='space-between'>
       <Card variant='outlined'>
-        <Typography
-          component='h1'
-          variant='h4'
-          sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-        >
-          Login
-        </Typography>
+        <Box className='flex justify-between items-center'>
+          <Typography
+            component='h1'
+            variant='h4'
+            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+          >
+            Login
+          </Typography>
+          {loading && (
+            <CircularProgress
+              sx={{ marginLeft: 2 }}
+              size={28}
+              className='flex text-white w-3 h-3'
+            />
+          )}
+        </Box>
         <Box
           component='form'
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
@@ -240,15 +252,9 @@ export const LogInModal = () => {
             type='button'
             fullWidth
             variant='contained'
+            disabled={loading}
             onClick={() => handleSubmit()}
           >
-            {loading && (
-              <CircularProgress
-                sx={{ marginRight: 2 }}
-                size={16}
-                className=' flex text-white w-3 h-3'
-              />
-            )}
             Login
           </Button>
           <Typography sx={{ textAlign: 'center' }}>

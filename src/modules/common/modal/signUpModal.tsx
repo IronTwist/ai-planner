@@ -150,9 +150,9 @@ export const SignUpModal = () => {
   };
 
   const handleSubmit = () => {
-    const invalidInputs = validateInputs();
+    const validInputs = validateInputs();
 
-    if (!invalidInputs || emailError || passwordError) {
+    if (!validInputs) {
       return;
     }
 
