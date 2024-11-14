@@ -4,6 +4,7 @@ import { addNote } from '@/store/reducers/notes-slice';
 import { AppDispatch } from '@/store/store';
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
+import { Canvas } from './../../UI/components/canvas/canvas';
 
 export const AddNoteModal = () => {
   const dispatch = useAppDispatch<AppDispatch>();
@@ -51,7 +52,7 @@ export const AddNoteModal = () => {
   return (
     <Box
       sx={{
-        width: '24rem',
+        width: 'auto',
         padding: '1rem',
         border: '1px solid #ccc',
         borderRadius: '10px',
@@ -91,6 +92,8 @@ export const AddNoteModal = () => {
           onChange={e => setContent(e.target.value)}
           className='mb-4'
         />
+
+        <Canvas width={340} height={280} />
 
         <Box
           className='flex justify-between space-x-2'
