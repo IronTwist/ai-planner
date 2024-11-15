@@ -36,3 +36,12 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 # ai-planner
+
+This note-taking app is a personal project currently under development. It is designed for use with stylus-enabled devices such as Samsung S6 tablets. 
+Regular updates will be provided to enhance the app's functionality and user experience
+
+-Login system
+-redux state management system
+-notes
+
+
