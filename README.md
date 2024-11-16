@@ -22,3 +22,5 @@ Regular updates will be provided to enhance the app's functionality and user exp
 ## Deployed on Vercel
 
 Link for production version: https://ai-planner-2077.vercel.app
+
+![image](https://github.com/user-attachments/assets/8e05ba09-fb95-43ef-adcb-0c1c1c407c13)
