@@ -1,6 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  images: {
+    domains: [process.env.VERCEL_BLOB_BASE_URL as string],
+  },
+
   /* config options here */
   env: {
     FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,

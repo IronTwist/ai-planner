@@ -5,7 +5,6 @@ export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('Authorization') || '';
   const token = authHeader.replace('Bearer ', '');
 
-  console.log('token', token);
   try {
     const decodedToken = await adminAuth.verifyIdToken(token);
     const userId = decodedToken.uid;
@@ -35,12 +34,13 @@ export async function POST(req: NextRequest) {
   const token = authHeader.replace('Bearer ', '');
 
   try {
-    const { title, content } = await req.json();
+    const { title, content, noteId } = await req.json();
 
     const decodedToken = await adminAuth.verifyIdToken(token);
     const userId = decodedToken.uid;
 
     const noteData = {
+      noteId,
       title,
       content,
       createdAt: Date.now(),
@@ -55,7 +55,32 @@ export async function POST(req: NextRequest) {
 
     await noteRef.set(noteData);
 
-    return NextResponse.json({ data: noteData, error: null });
+    return NextResponse.json({ data: { noteData, noteRef }, error: null });
+  } catch (error) {
+    return NextResponse.json({ data: null, error: error });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  const authHeader = req.headers.get('Authorization') || '';
+  const token = authHeader.replace('Bearer ', '');
+
+  try {
+    const { noteId, title, content, downloadUrl, pathname, url } =
+      await req.json();
+
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    const userId = decodedToken.uid;
+
+    const noteRef = adminFirestore
+      .collection('notes')
+      .doc(userId)
+      .collection('notes')
+      .doc(noteId);
+
+    await noteRef.update({ title, content, downloadUrl, pathname, url });
+
+    return NextResponse.json({ data: noteRef, error: null });
   } catch (error) {
     return NextResponse.json({ data: null, error: error });
   }

@@ -3,16 +3,24 @@ import { closeModal } from '@/store/reducers/modal-slice';
 import { addNote } from '@/store/reducers/notes-slice';
 import { AppDispatch } from '@/store/store';
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { RefObject, useEffect, useState } from 'react';
 import { Canvas } from './../../UI/components/canvas/canvas';
+import { FaFileExport, FaICursor, FaPenFancy } from 'react-icons/fa6';
+import { generateUniqueId } from '@/utils';
 
 export const AddNoteModal = () => {
   const dispatch = useAppDispatch<AppDispatch>();
   const user = useAppSelector(state => state.auth.user);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [contentType, setContentType] = useState<'draw' | 'text'>('text');
+  const [canvasWidth, setCanvasWidth] = useState(0);
+  const [canvasHeight, setCanvasHeight] = useState(0);
+  // const [isErasing, setIsErasing] = useState(false);
 
-  const handleSave = async () => {
+  const handleSave = async (canvasRef?: RefObject<HTMLCanvasElement>) => {
+    const noteId = generateUniqueId();
+
     const resp = await fetch(`/api/store/notes`, {
       method: 'POST',
       headers: {
@@ -20,6 +28,7 @@ export const AddNoteModal = () => {
         Authorization: `Bearer ${user?.token}`,
       },
       body: JSON.stringify({
+        noteId,
         title,
         content,
         userId: user?.uid,
@@ -28,11 +37,68 @@ export const AddNoteModal = () => {
 
     const { data, error } = await resp.json();
 
-    console.log('add note data: ', data);
-
     // TODO: handle error later
     if (data) {
-      dispatch(addNote({ ...data }));
+      canvasRef?.current?.toBlob(
+        async blob => {
+          const file = new File([blob as Blob], `${noteId}-file.jpg`, {
+            type: 'image/jpeg',
+          });
+
+          if (blob) {
+            if (contentType === 'draw') {
+              const response = await fetch(
+                `/api/notes/upload?filename=${file.name}`,
+                {
+                  method: 'POST',
+                  body: file,
+                },
+              );
+              const fileUploadData = await response.json();
+
+              if (fileUploadData) {
+                // Update the note with the file URL
+                const updateResponse = await fetch(`/api/store/notes`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user?.token}`,
+                  },
+                  body: JSON.stringify({
+                    noteId: data.noteRef._path.segments[3],
+                    title,
+                    content,
+                    userId: user?.uid,
+                    downloadUrl: fileUploadData.downloadUrl,
+                    pathname: fileUploadData.pathname,
+                    url: fileUploadData.url,
+                  }),
+                });
+
+                await updateResponse.json();
+
+                dispatch(
+                  addNote({
+                    ...data,
+                    downloadUrl: fileUploadData.downloadUrl,
+                    pathname: fileUploadData.pathname,
+                    url: fileUploadData.url,
+                  }),
+                );
+                dispatch(closeModal());
+              }
+            }
+          }
+        },
+        'image/jpeg',
+        0.95, // JPEG quality
+      );
+
+      dispatch(
+        addNote({
+          ...data,
+        }),
+      );
       dispatch(closeModal());
     } else {
       console.log('An error occurred', error);
@@ -49,72 +115,137 @@ export const AddNoteModal = () => {
     setContent('');
   };
 
+  useEffect(() => {
+    // get width of window and displya modal on 90% of width
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const x = width * 0.9;
+    const y = height * 0.9;
+    setCanvasWidth(x);
+    setCanvasHeight(y);
+  }, []);
+
   return (
     <Box
       sx={{
-        width: 'auto',
+        width: canvasWidth,
         padding: '1rem',
-        border: '1px solid #ccc',
         borderRadius: '10px',
         backgroundColor: '#fff',
+        userSelect: 'none',
       }}
     >
       <Typography
         className='text-2xl font-bold'
-        sx={{ color: 'black', marginBottom: '2rem' }}
+        sx={{ color: 'black', marginBottom: '1rem' }}
       >
-        Add Note
+        New note
       </Typography>
       <Stack spacing={2}>
-        <TextField
-          label='Title'
-          variant='outlined'
-          fullWidth
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          className='mb-4 text-yellow-50'
-          placeholder='Enter title'
-          sx={{
-            border: '1px solid #ccc',
-            borderRadius: '10px',
-            color: 'white',
-          }}
-        />
+        <Box className='flex w-full justify-between'>
+          <TextField
+            label='Title here'
+            variant='outlined'
+            fullWidth
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            className='mb-4 text-yellow-50'
+            placeholder='e.g., My book list'
+            sx={{
+              borderRadius: '10px',
+              color: 'white',
+              width: '20rem',
+            }}
+          />
+          <Button
+            sx={{
+              width: 'auto',
+              maxWidth: '12rem',
+              height: '2rem',
+              verticalAlign: 'center',
+            }}
+            size='medium'
+            variant={contentType === 'text' ? 'contained' : 'outlined'}
+            color='secondary'
+            onClick={() =>
+              setContentType(contentType === 'text' ? 'draw' : 'text')
+            }
+            className='hover:bg-gray-100'
+          >
+            {contentType === 'text' ? (
+              <div className='flex gap-2 items-center'>
+                <FaPenFancy size={20} /> Pen mode
+              </div>
+            ) : (
+              <div className='flex gap-2 items-center'>
+                <FaICursor size={20} /> Keyboard mode
+              </div>
+            )}
+          </Button>
+        </Box>
+        <Box className='flex flex-col space-x-2 gap-6'>
+          {contentType === 'text' && (
+            <TextField
+              label='Content'
+              variant='outlined'
+              fullWidth
+              multiline
+              rows={4}
+              value={content}
+              placeholder='e.g. "Zen Mind, Beginners Mind" by Shunryu Suzuki'
+              onChange={e => setContent(e.target.value)}
+              className='mb-4'
+              sx={{
+                width: canvasWidth - 35,
+                height: 'auto',
+              }}
+            />
+          )}
+          {contentType === 'draw' && (
+            <Box className='flex w-full justify-between'>
+              <Button
+                variant='outlined'
+                color='secondary'
+                onClick={handleCancel}
+                className='hover:bg-gray-100'
+              >
+                Cancel
+              </Button>
+            </Box>
+          )}
 
-        <TextField
-          label='Content'
-          variant='outlined'
-          fullWidth
-          multiline
-          rows={4}
-          value={content}
-          placeholder='e.g. Take notes...'
-          onChange={e => setContent(e.target.value)}
-          className='mb-4'
-        />
-
-        <Canvas width={340} height={280} />
-
+          {contentType === 'draw' && (
+            <Canvas
+              width={canvasWidth - 35}
+              height={canvasHeight - 400}
+              onSave={canvasRef => handleSave(canvasRef)}
+            />
+          )}
+        </Box>
         <Box
           className='flex justify-between space-x-2'
           sx={{ justifyContent: 'space-between' }}
         >
-          <Button
-            variant='outlined'
-            color='secondary'
-            onClick={handleCancel}
-            className='hover:bg-gray-100'
-          >
-            Cancel
-          </Button>
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={handleSave}
-            className='bg-blue-500 hover:bg-blue-600 text-white'
-          >
-            Save
-          </Button>
+          {contentType === 'text' && (
+            <Button
+              variant='outlined'
+              color='secondary'
+              onClick={handleCancel}
+              className='hover:bg-gray-100'
+            >
+              Cancel
+            </Button>
+          )}
+          {contentType === 'text' && (
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={() => handleSave()}
+              className='bg-blue-500 hover:bg-blue-600 text-white gap-2'
+            >
+              <FaFileExport size={20} /> Save
+            </Button>
+          )}
         </Box>
       </Stack>
     </Box>
