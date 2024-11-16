@@ -5,6 +5,9 @@ export type Note = {
   title: string;
   content: string;
   createdAt: string;
+  url: string;
+  pathhname: string;
+  downloadUrl: string;
 };
 
 interface NotesState {
@@ -40,7 +43,6 @@ const notes = createSlice({
       };
     },
     getNotes: (state, action: PayloadAction<NotesState>) => {
-      console.log('Action Payload', action.payload);
       return {
         ...state,
         loading: false,

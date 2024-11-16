@@ -25,7 +25,6 @@ export default function SignUp() {
   const user = useAppSelector(state => state.auth.user);
 
   useEffect(() => {
-    console.log('user', user);
     if (user?.uid) {
       router.push('/');
     }
