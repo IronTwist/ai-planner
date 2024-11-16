@@ -1,6 +1,5 @@
 'use client';
 
-import { useAppSelector } from '@/store/hooks';
 import { Button } from '@mui/material';
 import { RefObject, useEffect, useRef } from 'react';
 import { FaEraser, FaFileExport } from 'react-icons/fa6';
