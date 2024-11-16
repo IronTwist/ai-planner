@@ -98,9 +98,6 @@ export const AuthCallWrapper = ({
           // If token is about to expire in the next 5 minutes, refresh it
           if (timeInMinutes < 5) {
             const newToken = await user.getIdToken(true);
-
-            console.log('New token: ', newToken);
-
             if (cookie) {
               const { uid, email, refreshToken, newAccount, metadata } =
                 JSON.parse(cookie);
@@ -146,10 +143,8 @@ export const AuthCallWrapper = ({
     onAuthStateChanged(auth, user => {
       if (user) {
         // User is signed in, user object is returned
-        console.log('User is signed in:', user);
       } else {
         // No user is signed in
-        console.log('User is signed out');
       }
     });
   }, []);

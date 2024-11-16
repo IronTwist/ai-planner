@@ -1,18 +1,36 @@
 'use client';
 
+import { useAppSelector } from '@/store/hooks';
 import { Button } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef } from 'react';
+import { FaEraser, FaFileExport } from 'react-icons/fa6';
 
 interface CanvasProps {
   width: number;
   height: number;
+  onSave: (canvasRef: RefObject<HTMLCanvasElement>) => void;
 }
 
-export const Canvas = ({ width, height }: CanvasProps) => {
+// Function to draw a horizontal line
+function drawLine(
+  ctx: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
+  y: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(0, y);
+  ctx.lineTo(canvas.width, y);
+  ctx.strokeStyle = 'gray';
+  ctx.stroke();
+  ctx.strokeStyle = 'blue';
+}
+
+export const Canvas = ({ width, height, onSave }: CanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   //   const [xTest, setXTest] = useState(0);
   //   const [yTest, setYTest] = useState(0);
-  const [showScaleFactor, setShowScaleFactor] = useState(0);
+  // const [showScaleFactor, setShowScaleFactor] = useState(0);
+  // const user = useAppSelector(state => state.auth.user);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,8 +38,8 @@ export const Canvas = ({ width, height }: CanvasProps) => {
       const ctx = canvas.getContext('2d');
 
       // Set scaling factor for high DPI canvas (e.g., 5x)
-      const scaleFactor = 5;
-      setShowScaleFactor(scaleFactor);
+      const scaleFactor = 2.5;
+      // setShowScaleFactor(scaleFactor);
       // Set internal canvas size to be scaled
       canvas.width = width * scaleFactor;
       canvas.height = height * scaleFactor;
@@ -31,9 +49,9 @@ export const Canvas = ({ width, height }: CanvasProps) => {
 
       if (ctx) {
         // Initial canvas setup
-        ctx.fillStyle = '#f5f2da';
+        ctx.fillStyle = '#f0efeb';
         ctx.fillRect(0, 0, width * scaleFactor, height * scaleFactor);
-        ctx.strokeStyle = 'blue';
+
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.imageSmoothingEnabled = true;
@@ -43,6 +61,15 @@ export const Canvas = ({ width, height }: CanvasProps) => {
         let drawing = false;
         let lastX = 0;
         let lastY = 0;
+
+        // Draw lines with a spacing of 100 pixels
+        let y = 100;
+        while (y < canvas.height) {
+          drawLine(ctx, canvas, y);
+          y += 100;
+        }
+
+        ctx.strokeStyle = 'blue';
 
         // Function to start drawing
         const startDrawing = (e: PointerEvent) => {
@@ -114,37 +141,68 @@ export const Canvas = ({ width, height }: CanvasProps) => {
   }, [width, height]);
 
   const handleSave = async () => {
-    canvasRef.current?.toBlob(
-      blob => {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob as Blob);
-        link.download = 'image.jpg';
+    // canvasRef.current?.toBlob(
+    //   async blob => {
+    //     const file = new File([blob as Blob], `${user?.uid}-imagine.jpg`, {
+    //       type: 'image/jpeg',
+    //     });
 
-        link.click();
+    //     console.log('Start upload');
+    //     if (blob) {
+    //       const response = await fetch(
+    //         `/api/notes/upload?filename=${file.name}`,
+    //         {
+    //           method: 'POST',
+    //           body: file,
+    //         },
+    //       );
+    //       const data = await response.json();
+    //       console.log('Upload response: ', data);
+    //     }
+    //   },
+    //   'image/jpeg',
+    //   0.95, // JPEG quality
+    // );
 
-        URL.revokeObjectURL(link.href);
-      },
-      'image/jpeg',
-      0.95, // JPEG quality
-    );
+    console.log('Start saving on canvas: ', canvasRef.current);
+    onSave(canvasRef);
+  };
+
+  const handleErase = () => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (canvas && context) {
+      // context.clearRect(0, 0, width * 5, height * 5);
+      context.reset();
+
+      // Initial canvas setup
+      context.fillStyle = '#f0efeb';
+      context.fillRect(0, 0, width * 2.5, height * 2.5);
+
+      context.lineJoin = 'round';
+      context.lineCap = 'round';
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+
+      context.beginPath();
+      context.strokeStyle = 'lightgray';
+      let y = 100;
+      while (y < canvas?.height) {
+        drawLine(context, canvas, y);
+        y += 100;
+      }
+    }
   };
 
   return (
     <div className='flex flex-col gap-2'>
-      <div className='flex'>debug: showScaleFactor: {showScaleFactor}</div>
+      {/* <div className='flex'>debug: showScaleFactor: {showScaleFactor}</div> */}
       <div className='flex justify-between'>
-        <Button
-          variant='contained'
-          onClick={() =>
-            canvasRef.current
-              ?.getContext('2d')
-              ?.clearRect(0, 0, width * 5, height * 5)
-          }
-        >
-          Clear
+        <Button variant='contained' onClick={handleErase}>
+          <FaEraser size={20} />
         </Button>
-        <Button variant='contained' onClick={handleSave}>
-          Save
+        <Button variant='contained' className='flex gap-2' onClick={handleSave}>
+          <FaFileExport size={20} /> Save
         </Button>
       </div>
       <canvas
