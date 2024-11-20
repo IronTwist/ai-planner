@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob';
+import { del, put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -11,4 +11,17 @@ export async function POST(request: Request) {
 
     return NextResponse.json(blob);
   }
+}
+
+export async function DELETE(request: Request) {
+  const { url } = await request.json();
+
+  try {
+    const resp = await del(url);
+    console.log('resp:', resp);
+  } catch (error) {
+    console.log('error:', error);
+    return NextResponse.json({ data: null, error: error });
+  }
+  return NextResponse.json({ data: 'Delete successfully', error: null });
 }

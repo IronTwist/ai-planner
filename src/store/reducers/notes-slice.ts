@@ -6,7 +6,7 @@ export type Note = {
   content: string;
   createdAt: string;
   url: string;
-  pathhname: string;
+  pathname: string;
   downloadUrl: string;
 };
 
@@ -50,8 +50,18 @@ const notes = createSlice({
         error: action.payload.error,
       };
     },
+    updateNote: (state, action: PayloadAction<Note>) => {
+      return {
+        ...state,
+        loading: false,
+        notes: state.notes.map(note =>
+          note.id === action.payload.id ? action.payload : note,
+        ),
+        error: null,
+      };
+    },
   },
 });
 
-export const { addNote, setNotes, getNotes } = notes.actions;
+export const { addNote, setNotes, getNotes, updateNote } = notes.actions;
 export default notes.reducer;
