@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserInfo, setCache } from './session/server-sessions';
+import { getUserInfo } from './session/server-sessions';
 
 export default async function middlewares(req: NextRequest) {
   let isLogedIn = false;
@@ -12,15 +12,30 @@ export default async function middlewares(req: NextRequest) {
 
   if (userData?.uid && userData?.token) {
     // TODO: use cookies to save data in cache for server side if needed
-    setCache('userName', userData?.userName);
-    setCache('email', userData?.email);
+    // setCache('userName', userData?.userName);
+    // setCache('email', userData?.email);
 
     isLogedIn = true;
   }
 
+  const currentRoute = req.nextUrl.pathname;
   const protectedRoutes = ['/', '/dashboard', '/profile', '/notes'];
+  const publicRoutes = ['/auth/login', '/auth/sign-up'];
 
-  if (!isLogedIn && protectedRoutes.includes(req.nextUrl.pathname)) {
+  // check for a route like /notes/HWRTGe1w....
+  const isProtectedRoute = currentRoute.startsWith(protectedRoutes[3]);
+
+  console.log('\x1b[33m%s\x1b[0m', 'Current route: ', currentRoute);
+
+  if (isProtectedRoute && !isLogedIn) {
+    return NextResponse.redirect(new URL('/auth/login', route));
+  }
+
+  if (
+    !isLogedIn &&
+    protectedRoutes.includes(req.nextUrl.pathname) &&
+    !publicRoutes.includes(req.nextUrl.pathname)
+  ) {
     console.log('req.nextUrl.pathname', req.nextUrl.pathname);
     return NextResponse.redirect(new URL('/auth/login', route));
   }

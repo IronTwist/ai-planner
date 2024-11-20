@@ -11,8 +11,10 @@ import { AppDispatch } from '@/store/store';
 import { useEffect } from 'react';
 import { getAuth, getIdTokenResult, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { notesRepository } from './repositories/notes';
+import { setNotes } from '@/store/reducers/notes-slice';
 
-export const AuthCallWrapper = ({
+export const AppWrapper = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -133,10 +135,21 @@ export const AuthCallWrapper = ({
       } else {
         // No user is signed in
         dispatch(logOut());
-        router.push(`${window.location.origin}/auth/login`);
+        // router.push(`${window.location.origin}/auth/login`);
       }
     });
   }, [dispatch, router, userStore]);
+
+  useEffect(() => {
+    if (userStore?.uid) {
+      // initialize state
+      notesRepository.getNotes(userStore).then(data => {
+        dispatch(
+          setNotes({ notes: data.data, loading: false, error: data.error }),
+        );
+      });
+    }
+  }, [dispatch, userStore]);
 
   useEffect(() => {
     const auth = getAuth();

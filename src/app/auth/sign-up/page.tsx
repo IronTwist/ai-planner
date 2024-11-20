@@ -26,7 +26,7 @@ export default function SignUp() {
 
   useEffect(() => {
     if (user?.uid) {
-      router.push('/');
+      router.push(`${window.location.origin}/`);
     }
   }, [user, router]);
 
