@@ -14,8 +14,8 @@ export const AddNoteModal = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [contentType, setContentType] = useState<'draw' | 'text'>('text');
-  const [canvasWidth, setCanvasWidth] = useState(0);
-  const [canvasHeight, setCanvasHeight] = useState(0);
+  // const [canvasWidth, setCanvasWidth] = useState(0);
+  // const [canvasHeight, setCanvasHeight] = useState(0);
   // const [isErasing, setIsErasing] = useState(false);
 
   const handleSave = async (canvasRef?: RefObject<HTMLCanvasElement>) => {
@@ -117,22 +117,24 @@ export const AddNoteModal = () => {
 
   useEffect(() => {
     // get width of window and displya modal on 90% of width
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const x = width * 0.9;
-    const y = height * 0.9;
-    setCanvasWidth(x);
-    setCanvasHeight(y);
+    // const width = window.innerWidth;
+    // const height = window.innerHeight;
+    // const x = width * 0.9;
+    // const y = height * 0.9;
+    // setCanvasWidth(x);
+    // setCanvasHeight(y);
   }, []);
 
   return (
     <Box
       sx={{
-        width: canvasWidth,
+        width: '100%',
         padding: '1rem',
         borderRadius: '10px',
         backgroundColor: '#fff',
         userSelect: 'none',
+        overflow: 'scroll',
+        overflowx: 'hidden',
       }}
     >
       <Typography
@@ -183,7 +185,7 @@ export const AddNoteModal = () => {
             )}
           </Button>
         </Box>
-        <Box className='flex flex-col space-x-2 gap-6'>
+        <Box className='flex flex-col gap-6'>
           {contentType === 'text' && (
             <TextField
               label='Content'
@@ -196,7 +198,7 @@ export const AddNoteModal = () => {
               onChange={e => setContent(e.target.value)}
               className='mb-4'
               sx={{
-                width: canvasWidth - 35,
+                // width: canvasWidth - 35,
                 height: 'auto',
               }}
             />
@@ -215,11 +217,17 @@ export const AddNoteModal = () => {
           )}
 
           {contentType === 'draw' && (
-            <Canvas
-              width={canvasWidth - 35}
-              height={canvasHeight - 400}
-              onSave={canvasRef => handleSave(canvasRef)}
-            />
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                alignItems: 'center',
+                paddingBottom: '1rem',
+                backgroundColor: 'green',
+              }}
+            >
+              <Canvas onSave={canvasRef => handleSave(canvasRef)} />
+            </div>
           )}
         </Box>
         <Box

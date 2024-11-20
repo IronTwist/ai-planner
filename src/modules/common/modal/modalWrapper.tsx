@@ -7,15 +7,6 @@ import { useAppDispatch } from '@/store/hooks';
 import { AppDispatch } from '@/store/store';
 import { closeModal } from '@/store/reducers/modal-slice';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  borderRadius: '10px',
-  boxShadow: 24,
-};
-
 export type ModalWrapperType = {
   open: boolean;
   children: React.ReactNode;
@@ -35,8 +26,22 @@ export const ModalWrapper = ({ open, children }: ModalWrapperType) => {
         onClose={handleClose}
         aria-labelledby='modal-modal-title'
         aria-describedby='modal-modal-description'
+        sx={{ height: '100%', overflow: 'scroll' }}
       >
-        <Box sx={style}>{children}</Box>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '30%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            borderRadius: '10px',
+            boxShadow: 24,
+            width: '90%',
+            height: '50%',
+          }}
+        >
+          {children}
+        </Box>
       </Modal>
     </div>
   );

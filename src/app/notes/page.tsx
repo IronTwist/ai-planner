@@ -43,6 +43,10 @@ export default function Notes() {
     setFocusNote(id);
   };
 
+  const viewNote = (note: Note) => {
+    router.push(`${window.location.origin}/notes/${note.id}`);
+  };
+
   // TODO extract all functions to a repository and call GET after login
   useEffect(() => {
     if (
@@ -97,18 +101,17 @@ export default function Notes() {
           return (
             <div
               id='note'
-              className='flex flex-col w-[288px] h-72 bg-[#fff] text-black rounded-md gap-2 p-4 pb-0 justify-between shadow-[0_3px_6px_rgba(0,0,0,0.16),_0_3px_6px_rgba(0,0,0,0.23)] hover:shadow-[0_14px_28px_rgba(0,0,0,0.25),_0_10px_10px_rgba(0,0,0,0.22)]'
+              className='flex flex-col w-[288px] h-72 bg-[#fff] text-black rounded-md gap-2 p-4 pb-0 justify-between shadow-[0_1px_3px_rgba(0,0,0,0.12),_0_1px_2px_rgba(0,0,0,0.24)] transition duration-300 ease-in-out hover:shadow-[0_14px_28px_rgba(0,0,0,0.25),_0_10px_10px_rgba(0,0,0,0.22)]'
               key={note.id}
               style={{ userSelect: 'none' }}
               onMouseOver={() => handleNoteFocus(note.id)}
               onPointerEnter={() => handleNoteFocus(note.id)}
             >
               <div className='flex justify-between'>
-                {note.title ? (
-                  <h2 className='font-bold'>{note.title}</h2>
-                ) : (
-                  <h2 className='font-bold'>No title</h2>
-                )}
+                <h2 className='font-bold' onClick={() => viewNote(note)}>
+                  {note.title ? note.title : 'Untitled'}
+                </h2>
+
                 {focusNote === note.id && (
                   <div className='flex gap-2'>
                     <FaDownload
