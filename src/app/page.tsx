@@ -18,12 +18,12 @@ export default function Home() {
       <main className='flex flex-col gap-8 row-start-2 items-center sm:items-start p-4'>
         <h1 className='text-4xl font-bold'>Ai Planner</h1>
         <h3>Username: {!loading && user?.userName}</h3>
-        {/* <Image
+        <Image
           src='./images/patternpad.svg'
           width={100}
           height={100}
           alt='user'
-        /> */}
+        />
         {user ? (
           <div>
             <h2 className='text-2xl font-bold'>Welcome {user.userName}!</h2>

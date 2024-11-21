@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { AppDispatch } from '@/store/store';
 import { logOut } from '@/store/reducers/auth-slice';
 import { useRouter } from 'next/navigation';
-import { openModal } from '@/store/reducers/modal-slice';
+// import { openModal } from '@/store/reducers/modal-slice';
 import { NoSsr } from '@mui/material';
 import { protectedRoutes } from '@/middleware';
 // import { ModalWrapper } from '@/modules/common/modal/modalWrapper';
@@ -37,18 +37,6 @@ function Navigation() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null,
   );
-  const [showNav, setShowNav] = React.useState(false);
-
-  const displayOnlyOnRoutes = (route: string) => {
-    return allowOnlyOnRoutes.includes(route);
-  };
-
-  React.useEffect(() => {
-    if (displayOnlyOnRoutes(window.location.pathname)) {
-      console.log('displayOnlyOnRoutes', displayOnlyOnRoutes);
-      setShowNav(true);
-    }
-  }, []);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);

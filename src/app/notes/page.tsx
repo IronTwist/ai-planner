@@ -69,7 +69,7 @@ export default function Notes() {
 
   return (
     <div className='flex flex-col pt-10'>
-      <Box className='NoteTable flex bg-[#eee] h-[80%] p-7 mt-7 gap-6 flex-wrap justify-center'>
+      <Box className='NoteTable flex bg-cover bg-[url("/images/aaabstract.webp")] h-[80%] p-7 mt-7 gap-6 flex-wrap justify-center'>
         <Box
           sx={
             {
