@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+import { cookies } from 'next/dist/server/request/cookies';
 
 export const setCookies = async (data: { userId: string; token: string }) => {
   const cookieStore = await cookies();

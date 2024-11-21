@@ -13,7 +13,7 @@ export const AddNoteModal = () => {
   const user = useAppSelector(state => state.auth.user);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [contentType, setContentType] = useState<'draw' | 'text'>('text');
+  const [contentType, setContentType] = useState<'draw' | 'text'>('draw');
   // const [canvasWidth, setCanvasWidth] = useState(0);
   // const [canvasHeight, setCanvasHeight] = useState(0);
   // const [isErasing, setIsErasing] = useState(false);
@@ -144,7 +144,7 @@ export const AddNoteModal = () => {
         New note
       </Typography>
       <Stack spacing={2}>
-        <Box className='flex w-full justify-between'>
+        <Box className='flex w-full justify-between gap-2'>
           <TextField
             label='Title here'
             variant='outlined'
@@ -153,37 +153,55 @@ export const AddNoteModal = () => {
             onChange={e => setTitle(e.target.value)}
             className='mb-4 text-yellow-50'
             placeholder='e.g., My book list'
+            size='small'
             sx={{
               borderRadius: '10px',
               color: 'white',
               width: '20rem',
             }}
           />
-          <Button
-            sx={{
-              width: 'auto',
-              maxWidth: '12rem',
-              height: '2rem',
-              verticalAlign: 'center',
-            }}
-            size='medium'
-            variant={contentType === 'text' ? 'contained' : 'outlined'}
-            color='secondary'
-            onClick={() =>
-              setContentType(contentType === 'text' ? 'draw' : 'text')
-            }
-            className='hover:bg-gray-100'
-          >
-            {contentType === 'text' ? (
+          <div className='flex flex-col gap-2'>
+            <Button
+              sx={{
+                width: 'auto',
+                maxWidth: '12rem',
+                height: '2rem',
+                verticalAlign: 'center',
+              }}
+              size='medium'
+              disabled={contentType !== 'text'}
+              variant={contentType === 'text' ? 'contained' : 'outlined'}
+              color='secondary'
+              onClick={() =>
+                setContentType(contentType === 'text' ? 'draw' : 'text')
+              }
+              className='hover:bg-gray-100'
+            >
               <div className='flex gap-2 items-center'>
                 <FaPenFancy size={20} /> Pen mode
               </div>
-            ) : (
+            </Button>
+            <Button
+              sx={{
+                width: 'auto',
+                maxWidth: '12rem',
+                height: '2rem',
+                verticalAlign: 'center',
+              }}
+              size='medium'
+              disabled={contentType !== 'draw'}
+              variant={contentType === 'draw' ? 'contained' : 'outlined'}
+              color='secondary'
+              onClick={() =>
+                setContentType(contentType === 'text' ? 'draw' : 'text')
+              }
+              className='hover:bg-gray-100'
+            >
               <div className='flex gap-2 items-center'>
                 <FaICursor size={20} /> Keyboard mode
               </div>
-            )}
-          </Button>
+            </Button>
+          </div>
         </Box>
         <Box className='flex flex-col gap-6'>
           {contentType === 'text' && (

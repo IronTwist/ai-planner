@@ -138,6 +138,7 @@ export const LogInModal = () => {
   };
 
   const handleSubmit = () => {
+    console.log('submit');
     const validInputs = validateInputs();
 
     if (!validInputs) {
