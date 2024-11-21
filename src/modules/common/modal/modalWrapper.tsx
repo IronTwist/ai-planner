@@ -36,7 +36,7 @@ export const ModalWrapper = ({ open, children }: ModalWrapperType) => {
             transform: 'translate(-50%, -50%)',
             borderRadius: '10px',
             boxShadow: 24,
-            width: '90%',
+            width: 'auto',
             height: '50%',
           }}
         >

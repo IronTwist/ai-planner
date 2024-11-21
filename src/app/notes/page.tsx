@@ -68,12 +68,7 @@ export default function Notes() {
   }, [dispatch, fetchedNotes?.length, notes, router, user]);
 
   return (
-    <div className='flex flex-col p-8'>
-      <Box className='flex gap-2 w-full'>
-        <Button variant='contained' onClick={() => window.history.back()}>
-          Back
-        </Button>
-      </Box>
+    <div className='flex flex-col pt-10'>
       <Box className='NoteTable flex bg-[#eee] h-[80%] p-7 mt-7 gap-6 flex-wrap justify-center'>
         <Box
           sx={
@@ -107,7 +102,7 @@ export default function Notes() {
               onMouseOver={() => handleNoteFocus(note.id)}
               onPointerEnter={() => handleNoteFocus(note.id)}
             >
-              <div className='flex justify-between'>
+              <div className='flex justify-between hover:cursor-pointer'>
                 <h2 className='font-bold' onClick={() => viewNote(note)}>
                   {note.title ? note.title : 'Untitled'}
                 </h2>
@@ -143,10 +138,12 @@ export default function Notes() {
                 </pre>
                 {note.url && (
                   <Image
+                    className='cursor-pointer'
                     src={note.url}
                     alt={note.title}
                     width={288}
                     height={288}
+                    onClick={() => viewNote(note)}
                   />
                 )}
               </div>

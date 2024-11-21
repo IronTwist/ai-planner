@@ -19,7 +19,6 @@ export default function Login() {
 
   return (
     <div className='flex justify-center items-center pt-16 p-8'>
-      {/* <Navigation /> */}
       <LogInModal />
     </div>
   );

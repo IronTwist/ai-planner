@@ -7,6 +7,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { ReduxProvider } from '@/store/provider';
 import { AppWrapper } from './appWrapper';
+import Navigation from '@/modules/UI/navigation/navigation';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -36,6 +37,7 @@ export default function RootLayout({
         style={{ backgroundImage: 'url(/stars.gif)' }}
       >
         <ReduxProvider>
+          <Navigation />
           <AppWrapper>{children}</AppWrapper>
         </ReduxProvider>
       </body>

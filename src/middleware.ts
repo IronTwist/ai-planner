@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserInfo } from './session/server-sessions';
 
+export const protectedRoutes = ['/', '/dashboard', '/profile', '/notes'];
+
 export default async function middlewares(req: NextRequest) {
   let isLogedIn = false;
 
@@ -19,7 +21,7 @@ export default async function middlewares(req: NextRequest) {
   }
 
   const currentRoute = req.nextUrl.pathname;
-  const protectedRoutes = ['/', '/dashboard', '/profile', '/notes'];
+
   const publicRoutes = ['/auth/login', '/auth/sign-up'];
 
   // check for a route like /notes/HWRTGe1w....

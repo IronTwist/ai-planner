@@ -7,7 +7,14 @@ import { DisplayTooltip } from '@/modules/UI/components/molecules/display-toolti
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Note } from '@/store/reducers/notes-slice';
 import { AppDispatch } from '@/store/store';
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { format, formatDistanceToNow } from 'date-fns';
 import { RefObject, useEffect, useState } from 'react';
 // import { FaICursor, FaPenFancy } from 'react-icons/fa6';
@@ -132,12 +139,7 @@ export default function NoteView() {
   // }, []);
 
   return (
-    <div className='flex flex-col p-8 mb-8'>
-      <Box className='flex gap-2 w-full'>
-        <Button variant='contained' onClick={() => window.history.back()}>
-          Back
-        </Button>
-      </Box>
+    <div className='flex flex-col p-8 pt-16 mb-8 overflow-auto'>
       <Box
         sx={{
           padding: '1rem',
@@ -147,12 +149,30 @@ export default function NoteView() {
           marginTop: '1rem',
         }}
       >
-        <Typography
-          className='text-2xl font-bold'
-          sx={{ color: 'black', marginBottom: '1rem' }}
-        >
-          {note?.title || 'Untitled'}
-        </Typography>
+        <Box className='flex gap-2 w-full'>
+          <Button variant='contained' onClick={() => window.history.back()}>
+            Back
+          </Button>
+        </Box>
+        <Divider orientation='horizontal' sx={{ my: '1rem' }} flexItem />
+        <div className='flex justify-between items-center'>
+          <Typography
+            className='text-2xl font-bold items-center'
+            sx={{ color: 'black', marginBottom: '1rem' }}
+          >
+            {note?.title || 'Untitled'}
+          </Typography>
+          <Box className='flex justify-end'>
+            {createdAt && (
+              <DisplayTooltip
+                title={createdAt.createdAt}
+                content={formatDistanceToNow(createdAt.date, {
+                  addSuffix: true,
+                })}
+              />
+            )}
+          </Box>
+        </div>
         <Stack style={{ height: '100%' }} spacing={2}>
           {/* <Box className='flex w-full justify-between'> */}
           {/* <Button
@@ -220,16 +240,6 @@ export default function NoteView() {
                 )}
               </div>
             )}
-            <Box className='flex justify-end'>
-              {createdAt && (
-                <DisplayTooltip
-                  title={createdAt.createdAt}
-                  content={formatDistanceToNow(createdAt.date, {
-                    addSuffix: true,
-                  })}
-                />
-              )}
-            </Box>
           </Box>
           {/* <Box
             className='flex justify-between space-x-2'
