@@ -20,12 +20,12 @@ import { logOut } from '@/store/reducers/auth-slice';
 import { useRouter } from 'next/navigation';
 // import { openModal } from '@/store/reducers/modal-slice';
 import { NoSsr } from '@mui/material';
-import { protectedRoutes } from '@/middleware';
+// import { protectedRoutes } from '@/middleware';
 // import { ModalWrapper } from '@/modules/common/modal/modalWrapper';
 
 const pages = ['Home', 'Notes'];
 const settings = ['Profile', 'Logout'];
-const allowOnlyOnRoutes = protectedRoutes;
+// const allowOnlyOnRoutes = protectedRoutes;
 
 function Navigation() {
   const user = useAppSelector(state => state.auth.user);
