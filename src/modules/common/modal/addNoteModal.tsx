@@ -133,7 +133,6 @@ export const AddNoteModal = () => {
         borderRadius: '10px',
         backgroundColor: '#fff',
         userSelect: 'none',
-        overflow: 'scroll',
         overflowx: 'hidden',
       }}
     >
@@ -175,7 +174,6 @@ export const AddNoteModal = () => {
               onClick={() =>
                 setContentType(contentType === 'text' ? 'draw' : 'text')
               }
-              className='hover:bg-gray-100'
             >
               <div className='flex gap-2 items-center'>
                 <FaPenFancy size={20} /> Pen mode
@@ -195,7 +193,6 @@ export const AddNoteModal = () => {
               onClick={() =>
                 setContentType(contentType === 'text' ? 'draw' : 'text')
               }
-              className='hover:bg-gray-100'
             >
               <div className='flex gap-2 items-center'>
                 <FaICursor size={20} /> Keyboard mode
@@ -241,7 +238,6 @@ export const AddNoteModal = () => {
                 height: '100%',
                 alignItems: 'center',
                 paddingBottom: '1rem',
-                backgroundColor: 'green',
               }}
             >
               <Canvas onSave={canvasRef => handleSave(canvasRef)} />

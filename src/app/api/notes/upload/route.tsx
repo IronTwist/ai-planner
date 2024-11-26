@@ -17,10 +17,8 @@ export async function DELETE(request: Request) {
   const { url } = await request.json();
 
   try {
-    const resp = await del(url);
-    console.log('resp:', resp);
+    await del(url);
   } catch (error) {
-    console.log('error:', error);
     return NextResponse.json({ data: null, error: error });
   }
   return NextResponse.json({ data: 'Delete successfully', error: null });
