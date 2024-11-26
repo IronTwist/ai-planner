@@ -7,6 +7,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { ReduxProvider } from '@/store/provider';
 import { AppWrapper } from './appWrapper';
+import Navigation from '@/modules/UI/navigation/navigation';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -30,12 +31,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html
+      lang='en'
+      style={{
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgb(178, 164, 237) rgb(240, 240, 240)',
+      }}
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ backgroundImage: 'url(/stars.gif)' }}
       >
         <ReduxProvider>
+          <Navigation />
           <AppWrapper>{children}</AppWrapper>
         </ReduxProvider>
       </body>

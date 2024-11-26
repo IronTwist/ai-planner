@@ -18,11 +18,14 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { AppDispatch } from '@/store/store';
 import { logOut } from '@/store/reducers/auth-slice';
 import { useRouter } from 'next/navigation';
-import { openModal } from '@/store/reducers/modal-slice';
+// import { openModal } from '@/store/reducers/modal-slice';
+import { NoSsr } from '@mui/material';
+// import { protectedRoutes } from '@/middleware';
 // import { ModalWrapper } from '@/modules/common/modal/modalWrapper';
 
-const pages = ['Notes', 'Sign Up'];
+const pages = ['Home', 'Notes'];
 const settings = ['Profile', 'Logout'];
+// const allowOnlyOnRoutes = protectedRoutes;
 
 function Navigation() {
   const user = useAppSelector(state => state.auth.user);
@@ -44,13 +47,13 @@ function Navigation() {
 
   const handleCloseNavMenu = (page: string) => {
     setAnchorElNav(null);
-    if (page === 'Sign Up') {
-      // Test modal
-      dispatch(openModal({ name: 'signUpModal' }));
-    }
 
     if (page === 'Notes') {
       router.push(`${window.location.origin}/notes`);
+    }
+
+    if (page === 'Home') {
+      router.push(`${window.location.origin}/`);
     }
   };
 
@@ -66,161 +69,216 @@ function Navigation() {
   };
 
   return (
-    <AppBar
-      sx={{
-        color: 'black',
-        background:
-          'linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(1,149,231,1) 100%)',
-      }}
-      position='absolute'
-    >
-      <Container maxWidth='xl'>
-        <Toolbar disableGutters>
-          <Box
-            sx={{
-              width: 120,
-              height: 30,
-              display: { xs: 'none', md: 'flex' },
-              mr: 1,
-              borderRadius: '10%',
-            }}
-          >
-            <Image
-              src='/logo/ai_logo_planner.png'
-              alt='logo'
-              className='flex h-full'
-              width={120}
-              height={30}
-            />
-          </Box>
-
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size='large'
-              aria-label='account of current user'
-              aria-controls='menu-appbar'
-              aria-haspopup='true'
-              onClick={handleOpenNavMenu}
-              color='inherit'
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id='menu-appbar'
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
-            >
-              {pages.map(page => (
-                <MenuItem key={page} onClick={() => handleCloseNavMenu(page)}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <Image
-              src='/logo/ai_logo_planner.png'
-              alt='logo'
-              className='flex w-20 h-10'
-              width={80}
-              height={40}
-            />
-          </Box>
-          <Box
-            className='flex gap-2'
-            sx={{
-              flexGrow: 1,
-              gap: '0.5rem',
-              display: { xs: 'none', lg: 'block', xl: 'none' },
-            }}
-          >
-            {pages.map(page => (
-              <Button
-                key={page}
-                variant='outlined'
-                onClick={() => handleCloseNavMenu(page)}
+    user?.uid && (
+      <AppBar
+        sx={{
+          color: 'black',
+          background:
+            'linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(1,149,231,1) 100%)',
+        }}
+        position='absolute'
+      >
+        <NoSsr>
+          <Container maxWidth='xl'>
+            <Toolbar disableGutters>
+              <Box
                 sx={{
-                  my: 2,
-                  color: 'black',
+                  width: 120,
+                  height: 30,
+                  display: { xs: 'none', md: 'flex' },
+                  mr: 1,
+                  borderRadius: '10%',
+                }}
+              >
+                <Image
+                  src='/logo/ai_logo_planner.png'
+                  alt='logo'
+                  className='flex h-full'
+                  width={120}
+                  height={30}
+                />
+              </Box>
+
+              <Box sx={{ width: 'auto', display: { xs: 'flex', md: 'none' } }}>
+                <IconButton
+                  size='large'
+                  aria-label='account of current user'
+                  aria-controls='menu-appbar'
+                  aria-haspopup='true'
+                  onClick={handleOpenNavMenu}
+                  color='inherit'
+                >
+                  <MenuIcon />
+                </IconButton>
+
+                <Menu
+                  id='menu-appbar'
+                  anchorEl={anchorElNav}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                  open={Boolean(anchorElNav)}
+                  onClose={handleCloseNavMenu}
+                  sx={{
+                    display: { xs: 'flex', md: 'none' },
+                    gap: '1rem',
+                  }}
+                >
+                  {pages.map(page => (
+                    <MenuItem
+                      sx={{
+                        ':hover': {
+                          backgroundColor: 'skyblue',
+                        },
+                      }}
+                      LinkComponent={'button'}
+                      key={page}
+                      onClick={() => handleCloseNavMenu(page)}
+                    >
+                      <Button
+                        key={page}
+                        variant='contained'
+                        size='large'
+                        onClick={() => handleCloseNavMenu(page)}
+                        sx={{
+                          display: {
+                            xs: 'flex',
+                            md: 'none',
+                            lg: 'none',
+                            xl: 'none',
+                          },
+                          ':hover': {
+                            color: 'gold',
+                          },
+                        }}
+                      >
+                        {page}
+                      </Button>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Box>
+              <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                <Image
+                  src='/logo/ai_logo_planner.png'
+                  alt='logo'
+                  className='flex w-20 h-10'
+                  width={80}
+                  height={40}
+                />
+              </Box>
+              <Box
+                className='flex gap-2'
+                sx={{
+                  flexGrow: 1,
+                  gap: '0.5rem',
                   display: { xs: 'none', md: 'flex', lg: 'flex', xl: 'flex' },
                 }}
               >
-                {page}
-              </Button>
-            ))}
-          </Box>
-          {user && (
-            <Box sx={{ flexGrow: 0, alignContent: 'right', mr: '10px' }}>
-              {' '}
-              Welcome back, {user?.userName?.toUpperCase()}
-            </Box>
-          )}
-
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title='Open settings'>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt='Remy Sharp' src='/static/images/avatar/2.jpg' />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id='menu-appbar'
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {user && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                  }}
-                >
-                  <Typography
-                    sx={{ textAlign: 'center', p: '10px', color: 'darkblue' }}
+                {pages.map(page => (
+                  <Button
+                    key={page}
+                    variant='contained'
+                    onClick={() => handleCloseNavMenu(page)}
+                    sx={{
+                      my: 2,
+                      color: 'white',
+                      display: {
+                        xs: 'none',
+                        md: 'flex',
+                        lg: 'flex',
+                        xl: 'flex flex-row',
+                      },
+                    }}
                   >
-                    {user.email}
-                  </Typography>
+                    {page}
+                  </Button>
+                ))}
+              </Box>
+              {user && (
+                <Box sx={{ flexGrow: 0, alignContent: 'right', mr: '10px' }}>
+                  {' '}
+                  Welcome back, {user?.userName?.toUpperCase()}
                 </Box>
               )}
-              {settings.map(setting => (
-                <MenuItem
-                  sx={{ m: '10px' }}
-                  key={setting}
-                  disabled={setting === 'Profile'}
-                  onClick={handleCloseUserMenu}
+
+              <Box sx={{ flexGrow: 0 }}>
+                <Tooltip title='Open settings'>
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar
+                      alt='Remy Sharp'
+                      src='/static/images/avatar/2.jpg'
+                    />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  sx={{ mt: '45px' }}
+                  id='menu-appbar'
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorElUser)}
+                  // sx={{ display: { xs: 'block', md: 'none' } }}
+                  onClose={handleCloseUserMenu}
                 >
-                  <Box onClick={() => handleSetting(setting)}>
-                    <Typography sx={{ textAlign: 'center' }}>
-                      {setting}
-                    </Typography>
-                  </Box>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+                  {user && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          textAlign: 'center',
+                          p: '10px',
+                          color: 'darkblue',
+                        }}
+                      >
+                        {user.email}
+                      </Typography>
+                    </Box>
+                  )}
+                  {settings.map(setting => (
+                    <MenuItem
+                      key={setting}
+                      disabled={setting === 'Profile'}
+                      onClick={handleCloseUserMenu}
+                    >
+                      <Box
+                        sx={{
+                          width: '100%',
+                          cursor: 'pointer',
+                          bgcolor: 'lightblue',
+                          padding: 1,
+                        }}
+                        onClick={() => handleSetting(setting)}
+                      >
+                        <Typography sx={{ textAlign: 'center' }}>
+                          {setting}
+                        </Typography>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Box>
+            </Toolbar>
+          </Container>
+        </NoSsr>
+      </AppBar>
+    )
   );
 }
 export default Navigation;

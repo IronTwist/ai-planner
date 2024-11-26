@@ -639,6 +639,7 @@ import { FaEraser, FaFileExport } from 'react-icons/fa6';
 
 interface CanvasProps {
   loadContent?: string;
+  editMode?: boolean;
   onSave: (canvasRef: RefObject<HTMLCanvasElement>) => void;
 }
 
@@ -665,7 +666,11 @@ function drawGrid(
   }
 }
 
-export const Canvas = ({ loadContent, onSave }: CanvasProps) => {
+export const Canvas = ({
+  loadContent,
+  editMode = true,
+  onSave,
+}: CanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [isLandscape, setIsLandscape] = useState(
@@ -742,7 +747,11 @@ export const Canvas = ({ loadContent, onSave }: CanvasProps) => {
     };
 
     const draw = (e: PointerEvent) => {
-      if (!isDrawing || (e.pointerType !== 'pen' && e.pointerType !== 'mouse'))
+      if (
+        !editMode ||
+        !isDrawing ||
+        (e.pointerType !== 'pen' && e.pointerType !== 'mouse')
+      )
         return;
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -823,14 +832,20 @@ export const Canvas = ({ loadContent, onSave }: CanvasProps) => {
 
   return (
     <div className='flex flex-col gap-2'>
-      <div className='flex justify-between'>
-        <Button variant='contained' onClick={handleErase}>
-          <FaEraser size={20} />
-        </Button>
-        <Button variant='contained' className='flex gap-2' onClick={handleSave}>
-          <FaFileExport size={20} /> Save
-        </Button>
-      </div>
+      {editMode && (
+        <div className='flex justify-between'>
+          <Button variant='contained' onClick={handleErase}>
+            <FaEraser size={20} />
+          </Button>
+          <Button
+            variant='contained'
+            className='flex gap-2'
+            onClick={handleSave}
+          >
+            <FaFileExport size={20} /> Save
+          </Button>
+        </div>
+      )}
       <div className='flex justify-center'>
         <canvas
           ref={canvasRef}

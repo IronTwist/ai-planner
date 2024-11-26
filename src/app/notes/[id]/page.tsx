@@ -7,10 +7,18 @@ import { DisplayTooltip } from '@/modules/UI/components/molecules/display-toolti
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Note } from '@/store/reducers/notes-slice';
 import { AppDispatch } from '@/store/store';
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { format, formatDistanceToNow } from 'date-fns';
 import { RefObject, useEffect, useState } from 'react';
-// import { FaICursor, FaPenFancy } from 'react-icons/fa6';
+import { FaEdit } from 'react-icons/fa';
+import { MdClose } from 'react-icons/md';
 import { updateNote } from '@/store/reducers/notes-slice';
 
 export default function NoteView() {
@@ -19,7 +27,7 @@ export default function NoteView() {
   const notes = useAppSelector(state => state.notes.notes);
   const [note, setNote] = useState<Note | null>();
   const [noteCanvasUrl, setNoteCanvasUrl] = useState<string>('');
-  const [contentType, setContentType] = useState<'text' | 'draw'>();
+  const [editMode, setEditMode] = useState<boolean>(false);
   const [createdAt, setCreatedAt] = useState<{
     date: Date;
     createdAt: string;
@@ -31,10 +39,8 @@ export default function NoteView() {
     const urlId = window.location.pathname.split('/').pop();
     const getNoteFromState = notes?.find((note: Note) => note.id === urlId);
     setNote(getNoteFromState);
-    setContentType(getNoteFromState?.content ? 'text' : 'draw');
   }, [notes]);
 
-  console.log('note:', note);
   // function handleSave(canvasRef: RefObject<HTMLCanvasElement>): void {
   //   const canvas = canvasRef.current;
   //   const ctx = canvas?.getContext('2d');
@@ -68,7 +74,7 @@ export default function NoteView() {
         });
 
         if (blob) {
-          if (contentType === 'draw') {
+          if (editMode) {
             const response = await fetch(
               `/api/notes/upload?filename=${file.name}`,
               {
@@ -89,11 +95,12 @@ export default function NoteView() {
                 user,
               );
 
+              //TODO: TO FINISH Save and find a solution for canvas replace issue
+              console.log('data: ', data);
+
               if (error) {
                 console.log('error: ', error);
               }
-
-              console.log('data-after-save: ', data);
 
               dispatch(updateNote(updatedNote as Note));
             }
@@ -132,12 +139,7 @@ export default function NoteView() {
   // }, []);
 
   return (
-    <div className='flex flex-col p-8 mb-8'>
-      <Box className='flex gap-2 w-full'>
-        <Button variant='contained' onClick={() => window.history.back()}>
-          Back
-        </Button>
-      </Box>
+    <div className='flex flex-col p-8 pt-16 mb-8 overflow-auto'>
       <Box
         sx={{
           padding: '1rem',
@@ -147,15 +149,33 @@ export default function NoteView() {
           marginTop: '1rem',
         }}
       >
-        <Typography
-          className='text-2xl font-bold'
-          sx={{ color: 'black', marginBottom: '1rem' }}
-        >
-          {note?.title || 'Untitled'}
-        </Typography>
+        <Box className='flex gap-2 w-full'>
+          <Button variant='contained' onClick={() => window.history.back()}>
+            Back
+          </Button>
+        </Box>
+        <Divider orientation='horizontal' sx={{ my: '1rem' }} flexItem />
+        <div className='flex justify-between items-center'>
+          <Typography
+            className='text-2xl font-bold items-center'
+            sx={{ color: 'black', marginBottom: '1rem' }}
+          >
+            {note?.title || 'Untitled'}
+          </Typography>
+          <Box className='flex justify-end'>
+            {createdAt && (
+              <DisplayTooltip
+                title={createdAt.createdAt}
+                content={formatDistanceToNow(createdAt.date, {
+                  addSuffix: true,
+                })}
+              />
+            )}
+          </Box>
+        </div>
         <Stack style={{ height: '100%' }} spacing={2}>
-          {/* <Box className='flex w-full justify-between'> */}
-          {/* <Button
+          <Box className='flex w-full justify-between'>
+            <Button
               sx={{
                 width: 'auto',
                 maxWidth: '12rem',
@@ -163,28 +183,26 @@ export default function NoteView() {
                 verticalAlign: 'center',
               }}
               size='medium'
-              variant={contentType === 'text' ? 'contained' : 'outlined'}
+              variant={editMode ? 'contained' : 'outlined'}
               color='secondary'
-              onClick={() =>
-                // setContentType(contentType === 'text' ? 'draw' : 'text')
-              }
+              onClick={() => setEditMode(prev => !prev)}
             >
-              {contentType === 'text' ? (
+              {!editMode ? (
                 <div className='flex gap-2 items-center'>
-                  <FaPenFancy size={20} /> Pen mode
+                  <FaEdit size={20} /> Edit
                 </div>
               ) : (
                 <div className='flex gap-2 items-center'>
-                  <FaICursor size={20} /> Keyboard mode
+                  <MdClose size={20} /> Exit
                 </div>
               )}
-            </Button> */}
-          {/* </Box> */}
+            </Button>
+          </Box>
           <Box
             style={{ width: '100%', height: '100%' }}
             className='flex flex-col space-x-2 gap-6 h-auto'
           >
-            {contentType === 'text' && (
+            {editMode ? (
               <TextField
                 label='Content'
                 variant='outlined'
@@ -200,9 +218,11 @@ export default function NoteView() {
                   height: 'auto',
                 }}
               />
+            ) : (
+              <Box sx={{ color: 'black' }}>{note?.content}</Box>
             )}
 
-            {contentType === 'draw' && (
+            {editMode ? (
               <div
                 style={{
                   width: '100%',
@@ -219,17 +239,17 @@ export default function NoteView() {
                   />
                 )}
               </div>
+            ) : (
+              <Box>
+                {noteCanvasUrl?.length > 0 && (
+                  <Canvas
+                    editMode={false}
+                    loadContent={note?.url as string}
+                    onSave={canvasRef => handleSave(canvasRef)}
+                  />
+                )}
+              </Box>
             )}
-            <Box className='flex justify-end'>
-              {createdAt && (
-                <DisplayTooltip
-                  title={createdAt.createdAt}
-                  content={formatDistanceToNow(createdAt.date, {
-                    addSuffix: true,
-                  })}
-                />
-              )}
-            </Box>
           </Box>
           {/* <Box
             className='flex justify-between space-x-2'
