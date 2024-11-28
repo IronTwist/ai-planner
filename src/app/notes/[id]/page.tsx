@@ -41,66 +41,35 @@ export default function NoteView() {
     setNote(getNoteFromState);
   }, [notes]);
 
-  // function handleSave(canvasRef: RefObject<HTMLCanvasElement>): void {
-  //   const canvas = canvasRef.current;
-  //   const ctx = canvas?.getContext('2d');
-  //   if (canvas && ctx) {
-  //     const dataUrl = canvas.toDataURL('image/jpeg');
-  //     setNoteCanvasUrl(dataUrl);
-  //   }
-  // }
-
   const handleSave = async (canvasRef?: RefObject<HTMLCanvasElement>) => {
-    // TODO fix save
-    // 1. get image from url
-    const image = new Image();
-    image.src = noteCanvasUrl;
-
     await blobRepository.delete(note?.url);
 
-    const newCanvas = document.createElement('canvas');
-    newCanvas.width = canvasRef?.current?.width || 0;
-    newCanvas.height = canvasRef?.current?.height || 0;
-
-    const ctx = newCanvas.getContext('2d');
-    if (ctx) {
-      ctx.drawImage(canvasRef?.current as HTMLCanvasElement, 0, 0);
-    }
-
-    newCanvas.toBlob(
+    canvasRef?.current?.toBlob(
       async blob => {
         const file = new File([blob as Blob], `${note?.id}-file.jpg`, {
           type: 'image/jpeg',
         });
-
         if (blob) {
           if (editMode) {
             const response = await fetch(
               `/api/notes/upload?filename=${file.name}`,
               {
                 method: 'POST',
+                headers: {
+                  'Access-Control-Allow-Origin': '*',
+                },
                 body: file,
               },
             );
             const fileUploadData = await response.json();
-
             if (fileUploadData) {
               const updatedNote = {
                 ...note,
                 url: fileUploadData.url,
+                downloadUrl: fileUploadData.downloadUrl,
+                pathname: fileUploadData.pathname,
               };
-
-              const { data, error } = await notesRepository.updateNote(
-                updatedNote as Note,
-                user,
-              );
-
-              //TODO: TO FINISH Save and find a solution for canvas replace issue
-              console.log('data: ', data);
-
-              if (error) {
-                console.log('error: ', error);
-              }
+              await notesRepository.updateNote(updatedNote as Note, user);
 
               dispatch(updateNote(updatedNote as Note));
             }
@@ -149,9 +118,31 @@ export default function NoteView() {
           marginTop: '1rem',
         }}
       >
-        <Box className='flex gap-2 w-full'>
+        <Box className='flex gap-2 w-full justify-between'>
           <Button variant='contained' onClick={() => window.history.back()}>
             Back
+          </Button>
+          <Button
+            sx={{
+              width: 'auto',
+              maxWidth: '12rem',
+              height: '2rem',
+              verticalAlign: 'center',
+            }}
+            size='medium'
+            variant={!editMode ? 'contained' : 'outlined'}
+            color='secondary'
+            onClick={() => setEditMode(prev => !prev)}
+          >
+            {!editMode ? (
+              <div className='flex gap-2 items-center'>
+                <FaEdit size={20} /> Edit
+              </div>
+            ) : (
+              <div className='flex gap-2 items-center'>
+                <MdClose size={20} /> Exit
+              </div>
+            )}
           </Button>
         </Box>
         <Divider orientation='horizontal' sx={{ my: '1rem' }} flexItem />
@@ -174,30 +165,6 @@ export default function NoteView() {
           </Box>
         </div>
         <Stack style={{ height: '100%' }} spacing={2}>
-          <Box className='flex w-full justify-between'>
-            <Button
-              sx={{
-                width: 'auto',
-                maxWidth: '12rem',
-                height: '2rem',
-                verticalAlign: 'center',
-              }}
-              size='medium'
-              variant={editMode ? 'contained' : 'outlined'}
-              color='secondary'
-              onClick={() => setEditMode(prev => !prev)}
-            >
-              {!editMode ? (
-                <div className='flex gap-2 items-center'>
-                  <FaEdit size={20} /> Edit
-                </div>
-              ) : (
-                <div className='flex gap-2 items-center'>
-                  <MdClose size={20} /> Exit
-                </div>
-              )}
-            </Button>
-          </Box>
           <Box
             style={{ width: '100%', height: '100%' }}
             className='flex flex-col space-x-2 gap-6 h-auto'
@@ -219,7 +186,9 @@ export default function NoteView() {
                 }}
               />
             ) : (
-              <Box sx={{ color: 'black' }}>{note?.content}</Box>
+              <Box sx={{ color: 'black', whiteSpace: 'pre-wrap' }}>
+                {note?.content}
+              </Box>
             )}
 
             {editMode ? (
@@ -251,31 +220,6 @@ export default function NoteView() {
               </Box>
             )}
           </Box>
-          {/* <Box
-            className='flex justify-between space-x-2'
-            sx={{ justifyContent: 'space-between' }}
-          >
-            {contentType === 'text' && (
-              <Button
-                variant='outlined'
-                color='secondary'
-                onClick={handleCancel}
-                className='hover:bg-gray-100'
-              >
-                Cancel
-              </Button>
-            )}
-            {contentType === 'text' && (
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={() => handleSave()}
-                className='bg-blue-500 hover:bg-blue-600 text-white gap-2'
-              >
-                <FaFileExport size={20} /> Save
-              </Button>
-            )}
-          </Box> */}
         </Stack>
       </Box>
     </div>
