@@ -5,7 +5,7 @@ import { AppDispatch } from '@/store/store';
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { RefObject, useEffect, useState } from 'react';
 import { Canvas } from './../../UI/components/canvas/canvas';
-import { FaFileExport, FaICursor, FaPenFancy } from 'react-icons/fa6';
+import { FaFileExport, FaKeyboard, FaPenFancy } from 'react-icons/fa6';
 import { generateUniqueId } from '@/utils';
 
 export const AddNoteModal = () => {
@@ -195,7 +195,7 @@ export const AddNoteModal = () => {
               }
             >
               <div className='flex gap-2 items-center'>
-                <FaICursor size={20} /> Keyboard mode
+                <FaKeyboard size={20} /> Keyboard mode
               </div>
             </Button>
           </div>
