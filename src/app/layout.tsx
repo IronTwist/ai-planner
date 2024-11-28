@@ -31,7 +31,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html
+      lang='en'
+      style={{
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgb(178, 164, 237) rgb(240, 240, 240)',
+      }}
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ backgroundImage: 'url(/stars.gif)' }}

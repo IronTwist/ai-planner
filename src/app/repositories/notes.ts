@@ -22,7 +22,7 @@ export const notesRepository = {
         Authorization: `Bearer ${user?.token}`,
       },
     });
-    console.log('resp:', resp);
+
     const data = await resp.json();
     return data;
   },

@@ -5,7 +5,7 @@ import { AppDispatch } from '@/store/store';
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { RefObject, useEffect, useState } from 'react';
 import { Canvas } from './../../UI/components/canvas/canvas';
-import { FaFileExport, FaICursor, FaPenFancy } from 'react-icons/fa6';
+import { FaFileExport, FaKeyboard, FaPenFancy } from 'react-icons/fa6';
 import { generateUniqueId } from '@/utils';
 
 export const AddNoteModal = () => {
@@ -133,7 +133,6 @@ export const AddNoteModal = () => {
         borderRadius: '10px',
         backgroundColor: '#fff',
         userSelect: 'none',
-        overflow: 'scroll',
         overflowx: 'hidden',
       }}
     >
@@ -175,7 +174,6 @@ export const AddNoteModal = () => {
               onClick={() =>
                 setContentType(contentType === 'text' ? 'draw' : 'text')
               }
-              className='hover:bg-gray-100'
             >
               <div className='flex gap-2 items-center'>
                 <FaPenFancy size={20} /> Pen mode
@@ -195,10 +193,9 @@ export const AddNoteModal = () => {
               onClick={() =>
                 setContentType(contentType === 'text' ? 'draw' : 'text')
               }
-              className='hover:bg-gray-100'
             >
               <div className='flex gap-2 items-center'>
-                <FaICursor size={20} /> Keyboard mode
+                <FaKeyboard size={20} /> Keyboard mode
               </div>
             </Button>
           </div>
@@ -241,7 +238,6 @@ export const AddNoteModal = () => {
                 height: '100%',
                 alignItems: 'center',
                 paddingBottom: '1rem',
-                backgroundColor: 'green',
               }}
             >
               <Canvas onSave={canvasRef => handleSave(canvasRef)} />

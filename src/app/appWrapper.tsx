@@ -13,6 +13,7 @@ import { getAuth, getIdTokenResult, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { notesRepository } from './repositories/notes';
 import { setNotes } from '@/store/reducers/notes-slice';
+import { preloadImages } from '@/utils';
 
 export const AppWrapper = ({
   children,
@@ -53,7 +54,7 @@ export const AppWrapper = ({
     const auth = getAuth();
 
     onAuthStateChanged(auth, user => {
-      if (user) {
+      if (user?.uid) {
         const checkTokenExpiration = async () => {
           const cookie = getCookie('ai-planner-session');
           // if (cookie) {
@@ -160,6 +161,8 @@ export const AppWrapper = ({
         // No user is signed in
       }
     });
+
+    preloadImages();
   }, []);
 
   const childrenContent = {

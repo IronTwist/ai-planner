@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { FaRegTrashCan, FaCirclePlus, FaDownload } from 'react-icons/fa6';
 import { notesRepository } from '../repositories/notes';
 import Image from 'next/image';
+import { blobRepository } from '../repositories/vercel-blobs';
 
 export default function Notes() {
   const dispatch = useAppDispatch<AppDispatch>();
@@ -32,6 +33,8 @@ export default function Notes() {
     );
 
     if (!alertAnswer) return;
+
+    blobRepository.delete(fetchedNotes.find(note => note.id === id)?.url);
 
     notesRepository.deleteNote(id, user).then(data => {
       setFetchedNotes(fetchedNotes.filter(note => note.id !== id));
@@ -68,8 +71,8 @@ export default function Notes() {
   }, [dispatch, fetchedNotes?.length, notes, router, user]);
 
   return (
-    <div className='flex flex-col pt-10'>
-      <Box className='NoteTable flex bg-cover bg-[url("/images/aaabstract.webp")] h-[80%] p-7 mt-7 gap-6 flex-wrap justify-center'>
+    <div className='flex flex-col pt-10 overflow-hidden'>
+      <Box className='NoteTable flex bg-cover bg-[url("/images/aaabstract.webp")] bg-repeat h-[80%] p-7 mt-7 gap-6 flex-wrap justify-center'>
         <Box
           sx={
             {
