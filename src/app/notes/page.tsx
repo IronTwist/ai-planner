@@ -6,7 +6,17 @@ import { logOut } from '@/store/reducers/auth-slice';
 import { openModal } from '@/store/reducers/modal-slice';
 import { Note, setNotes } from '@/store/reducers/notes-slice';
 import { AppDispatch } from '@/store/store';
-import { Box, Button } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -23,16 +33,37 @@ export default function Notes() {
   const router = useRouter();
   const [focusNote, setFocusNote] = useState<string>('');
 
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<{
+    id?: string;
+    open?: boolean;
+  }>({
+    id: '',
+    open: false,
+  });
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   const handleAddNote = () => {
     dispatch(openModal({ name: 'addNoteModal' }));
   };
 
-  const handleDeleteNote = (id: string) => {
-    const alertAnswer = window.confirm(
-      'Are you sure you want to delete this note?',
-    );
+  const openConfirmDeleteDialog = (id: string) => {
+    setDeleteDialogOpen({ id, open: true });
+  };
 
-    if (!alertAnswer) return;
+  const handleCloseDeleteDialogConfirm = () => {
+    setDeleteDialogOpen({ open: false });
+    handleDeleteNote(deleteDialogOpen.id as string);
+  };
+
+  const handleCloseDeleteDialogCancel = () => {
+    setDeleteDialogOpen({ open: false });
+  };
+
+  const handleDeleteNote = (id: string) => {
+    // const alertAnswer = window.confirm(
+    //   'Are you sure you want to delete this note?',
+    // );
 
     blobRepository.delete(fetchedNotes.find(note => note.id === id)?.url);
 
@@ -123,7 +154,7 @@ export default function Notes() {
                     />
                     <FaRegTrashCan
                       className='hover:cursor-pointer'
-                      onClick={() => handleDeleteNote(note.id)}
+                      onClick={() => openConfirmDeleteDialog(note.id)}
                     />
                   </div>
                 )}
@@ -161,6 +192,29 @@ export default function Notes() {
           );
         })}
       </Box>
+      <Dialog
+        fullScreen={fullScreen}
+        open={deleteDialogOpen.open as boolean}
+        onClose={handleCloseDeleteDialogCancel}
+        aria-labelledby='responsive-dialog-title'
+      >
+        <DialogTitle variant='h5' id='responsive-dialog-title'>
+          Confirm Delete
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this note?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={handleCloseDeleteDialogCancel}>
+            Cance
+          </Button>
+          <Button onClick={handleCloseDeleteDialogConfirm} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

@@ -5,9 +5,12 @@ import { blobRepository } from '@/app/repositories/vercel-blobs';
 import { Canvas } from '@/modules/UI/components/canvas/canvas';
 import { DisplayTooltip } from '@/modules/UI/components/molecules/display-tooltip';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { Note } from '@/store/reducers/notes-slice';
+import { Note, setLoading } from '@/store/reducers/notes-slice';
 import { AppDispatch } from '@/store/store';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
   Divider,
@@ -20,11 +23,14 @@ import { RefObject, useEffect, useState } from 'react';
 import { FaEdit } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 import { updateNote } from '@/store/reducers/notes-slice';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useSnackbar } from 'notistack';
 
 export default function NoteView() {
   const dispatch = useAppDispatch<AppDispatch>();
   const user = useAppSelector(state => state.auth.user);
   const notes = useAppSelector(state => state.notes.notes);
+  const loading = useAppSelector(state => state.notes.loading);
   const [note, setNote] = useState<Note | null>();
   const [noteCanvasUrl, setNoteCanvasUrl] = useState<string>('');
   const [editMode, setEditMode] = useState<boolean>(false);
@@ -32,6 +38,9 @@ export default function NoteView() {
     date: Date;
     createdAt: string;
   }>();
+  const [editTitleValue, setEditTitleValue] = useState<string>('');
+  const [editContentValue, setEditContentValue] = useState<string>('');
+  const { enqueueSnackbar } = useSnackbar();
   // const [canvasWidth, setCanvasWidth] = useState(0);
   // const [canvasHeight, setCanvasHeight] = useState(0);
 
@@ -39,9 +48,13 @@ export default function NoteView() {
     const urlId = window.location.pathname.split('/').pop();
     const getNoteFromState = notes?.find((note: Note) => note.id === urlId);
     setNote(getNoteFromState);
+    setEditTitleValue(getNoteFromState?.title || '');
+    setEditContentValue(getNoteFromState?.content || '');
   }, [notes]);
 
   const handleSave = async (canvasRef?: RefObject<HTMLCanvasElement>) => {
+    dispatch(setLoading(true));
+
     await blobRepository.delete(note?.url);
 
     canvasRef?.current?.toBlob(
@@ -68,10 +81,17 @@ export default function NoteView() {
                 url: fileUploadData.url,
                 downloadUrl: fileUploadData.downloadUrl,
                 pathname: fileUploadData.pathname,
+                content: editContentValue,
+                title: editTitleValue,
               };
+
               await notesRepository.updateNote(updatedNote as Note, user);
 
               dispatch(updateNote(updatedNote as Note));
+              dispatch(setLoading(false));
+              enqueueSnackbar('Update Note Successfully!', {
+                variant: 'success',
+              });
             }
           }
         }
@@ -95,7 +115,7 @@ export default function NoteView() {
     setNoteCanvasUrl(note?.url as string);
   }, [note]);
 
-  useEffect(() => {}, [noteCanvasUrl?.length]);
+  useEffect(() => {}, [note, noteCanvasUrl?.length]);
 
   // useEffect(() => {
   //   // get width of window and displya modal on 90% of width
@@ -170,21 +190,54 @@ export default function NoteView() {
             className='flex flex-col space-x-2 gap-6 h-auto'
           >
             {editMode ? (
-              <TextField
-                label='Content'
-                variant='outlined'
-                fullWidth
-                multiline
-                rows={4}
-                value={note?.content}
-                placeholder='e.g. "Zen Mind, Beginners Mind" by Shunryu Suzuki'
-                // onChange={e => setContent(e.target.value)}
-                className='mb-4'
-                sx={{
-                  width: '100%',
-                  height: 'auto',
-                }}
-              />
+              <>
+                <Accordion
+                  className='rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.12),_0_1px_2px_rgba(0,0,0,0.24)] transition duration-300 ease-in-out hover:shadow-[0_14px_28px_rgba(0,0,0,0.25),_0_5px_5px_rgba(0,0,0,0.22)]'
+                  sx={{ marginLeft: '0.5rem', width: '50%' }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls='panel1-content'
+                    id='panel1-header'
+                  >
+                    Edit Title or Content
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <TextField
+                      label='Title'
+                      variant='outlined'
+                      fullWidth
+                      rows={4}
+                      value={editTitleValue}
+                      placeholder='e.g. "Zen Mind, Beginners Mind" by Shunryu Suzuki'
+                      onChange={e => setEditTitleValue(e.target.value)}
+                      className='mb-4'
+                      sx={{
+                        width: '100%',
+                        height: 'auto',
+                      }}
+                    />
+                  </AccordionDetails>
+
+                  <AccordionDetails>
+                    <TextField
+                      label='Content'
+                      variant='outlined'
+                      fullWidth
+                      multiline
+                      rows={4}
+                      value={editContentValue}
+                      placeholder='e.g. "Zen Mind, Beginners Mind" by Shunryu Suzuki'
+                      onChange={e => setEditContentValue(e.target.value)}
+                      className='mb-4'
+                      sx={{
+                        width: '100%',
+                        height: 'auto',
+                      }}
+                    />
+                  </AccordionDetails>
+                </Accordion>
+              </>
             ) : (
               <Box sx={{ color: 'black', whiteSpace: 'pre-wrap' }}>
                 {note?.content}
@@ -203,6 +256,7 @@ export default function NoteView() {
               >
                 {noteCanvasUrl?.length > 0 && (
                   <Canvas
+                    isSaving={loading}
                     loadContent={note?.url as string}
                     onSave={canvasRef => handleSave(canvasRef)}
                   />
