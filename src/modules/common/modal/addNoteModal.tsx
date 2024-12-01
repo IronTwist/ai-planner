@@ -129,7 +129,8 @@ export const AddNoteModal = () => {
     <Box
       sx={{
         width: '100%',
-        padding: '1rem',
+        paddingY: '1rem',
+        paddingX: contentType === 'draw' ? '7rem' : '1rem',
         borderRadius: '10px',
         backgroundColor: '#fff',
         userSelect: 'none',
@@ -143,7 +144,7 @@ export const AddNoteModal = () => {
         New note
       </Typography>
       <Stack spacing={2}>
-        <Box className='flex w-full justify-between gap-2'>
+        <Box className='flex w-full justify-between gap-6'>
           <TextField
             label='Title here'
             variant='outlined'
@@ -151,7 +152,7 @@ export const AddNoteModal = () => {
             value={title}
             onChange={e => setTitle(e.target.value)}
             className='mb-4 text-yellow-50'
-            placeholder='e.g., My book list'
+            placeholder='e.g. My book list'
             size='small'
             sx={{
               borderRadius: '10px',
@@ -166,6 +167,8 @@ export const AddNoteModal = () => {
                 maxWidth: '12rem',
                 height: '2rem',
                 verticalAlign: 'center',
+                gap: '0.5rem',
+                justifyContent: 'left',
               }}
               size='medium'
               disabled={contentType !== 'text'}
@@ -175,9 +178,7 @@ export const AddNoteModal = () => {
                 setContentType(contentType === 'text' ? 'draw' : 'text')
               }
             >
-              <div className='flex gap-2 items-center'>
-                <FaPenFancy size={20} /> Pen mode
-              </div>
+              <FaPenFancy size={20} /> Pen mode
             </Button>
             <Button
               sx={{
@@ -194,7 +195,10 @@ export const AddNoteModal = () => {
                 setContentType(contentType === 'text' ? 'draw' : 'text')
               }
             >
-              <div className='flex gap-2 items-center'>
+              <div
+                style={{ textWrap: 'nowrap' }}
+                className='flex gap-2 items-center'
+              >
                 <FaKeyboard size={20} /> Keyboard mode
               </div>
             </Button>

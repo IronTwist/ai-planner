@@ -60,8 +60,15 @@ const notes = createSlice({
         error: null,
       };
     },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      return {
+        ...state,
+        loading: action.payload,
+      };
+    },
   },
 });
 
-export const { addNote, setNotes, getNotes, updateNote } = notes.actions;
+export const { addNote, setNotes, getNotes, updateNote, setLoading } =
+  notes.actions;
 export default notes.reducer;
