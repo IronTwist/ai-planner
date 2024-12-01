@@ -168,7 +168,7 @@ export default function NoteView() {
         <Divider orientation='horizontal' sx={{ my: '1rem' }} flexItem />
         <div className='flex justify-between items-center'>
           <Typography
-            className='text-2xl font-bold items-center'
+            className='text-3xl font-bold items-center'
             sx={{ color: 'black', marginBottom: '1rem' }}
           >
             {note?.title || 'Untitled'}
@@ -192,8 +192,8 @@ export default function NoteView() {
             {editMode ? (
               <>
                 <Accordion
-                  className='rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.12),_0_1px_2px_rgba(0,0,0,0.24)] transition duration-300 ease-in-out hover:shadow-[0_14px_28px_rgba(0,0,0,0.25),_0_5px_5px_rgba(0,0,0,0.22)]'
-                  sx={{ marginLeft: '0.5rem', width: '50%' }}
+                  className=' shadow-[0_1px_3px_rgba(0,0,0,0.12),_0_1px_2px_rgba(0,0,0,0.24)] transition duration-300 ease-in-out hover:shadow-[0_14px_28px_rgba(0,0,0,0.25),_0_5px_5px_rgba(0,0,0,0.22)]'
+                  sx={{ width: '50%' }}
                 >
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
@@ -207,7 +207,6 @@ export default function NoteView() {
                       label='Title'
                       variant='outlined'
                       fullWidth
-                      rows={4}
                       value={editTitleValue}
                       placeholder='e.g. "Zen Mind, Beginners Mind" by Shunryu Suzuki'
                       onChange={e => setEditTitleValue(e.target.value)}
@@ -247,12 +246,12 @@ export default function NoteView() {
             {editMode ? (
               <div
                 style={{
-                  width: '100%',
                   height: '100%',
                   alignItems: 'center',
                   paddingBottom: '1rem',
+                  marginLeft: 0,
                 }}
-                className='flex flex-col bg-[#fff] text-black rounded-md gap-2 p-4 pb-0 justify-between shadow-[0_3px_6px_rgba(0,0,0,0.16),_0_3px_6px_rgba(0,0,0,0.23)] hover:shadow-[0_14px_28px_rgba(0,0,0,0.25),_0_10px_10px_rgba(0,0,0,0.22)]'
+                className='flex flex-col bg-[#fff] text-black rounded-md p-4 pb-0 justify-between shadow-[0_3px_6px_rgba(0,0,0,0.16),_0_3px_6px_rgba(0,0,0,0.23)] hover:shadow-[0_14px_28px_rgba(0,0,0,0.25),_0_10px_10px_rgba(0,0,0,0.22)]'
               >
                 {noteCanvasUrl?.length > 0 && (
                   <Canvas
