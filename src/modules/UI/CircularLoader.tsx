@@ -7,7 +7,7 @@ import CircularProgress, {
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-function CircularProgressWithLabel(
+export function CircularProgressWithLabel(
   props: CircularProgressProps & { value: number },
 ) {
   return (

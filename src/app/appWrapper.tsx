@@ -14,6 +14,15 @@ import { useRouter } from 'next/navigation';
 import { notesRepository } from './repositories/notes';
 import { setNotes } from '@/store/reducers/notes-slice';
 import { preloadImages } from '@/utils';
+import { SnackbarProvider } from 'notistack';
+
+const childrenContent = {
+  signUpModal: <SignUpModal />,
+  loginModal: <LogInModal />,
+  addNoteModal: <AddNoteModal />,
+};
+
+export type ModalName = keyof typeof childrenContent;
 
 export const AppWrapper = ({
   children,
@@ -165,22 +174,19 @@ export const AppWrapper = ({
     preloadImages();
   }, []);
 
-  const childrenContent = {
-    signUpModal: <SignUpModal />,
-    loginModal: <LogInModal />,
-    addNoteModal: <AddNoteModal />,
-  };
-
-  type ModalName = keyof typeof childrenContent;
-
   return (
     <>
-      <div>
-        <ModalWrapper open={modalStore.isOpen}>
-          {childrenContent[modalStore.name as ModalName]}
-        </ModalWrapper>
-      </div>
-      {children}
+      <SnackbarProvider
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        autoHideDuration={2000}
+      >
+        <div>
+          <ModalWrapper open={modalStore.isOpen}>
+            {childrenContent[modalStore.name as ModalName]}
+          </ModalWrapper>
+        </div>
+        {children}
+      </SnackbarProvider>
     </>
   );
 };

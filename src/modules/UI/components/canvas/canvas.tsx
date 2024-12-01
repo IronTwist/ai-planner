@@ -1,11 +1,12 @@
 'use client';
 
 import { blobRepository } from '@/app/repositories/vercel-blobs';
-import { Button } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import { RefObject, useEffect, useRef, useState } from 'react';
 import { FaEraser, FaFileExport } from 'react-icons/fa6';
 
 interface CanvasProps {
+  isSaving?: boolean;
   loadContent?: string;
   editMode?: boolean;
   onSave: (canvasRef: RefObject<HTMLCanvasElement>) => void;
@@ -32,11 +33,13 @@ function drawGrid(
     ctx.lineTo(canvas.width, y);
     ctx.stroke();
   }
+  ctx.strokeStyle = 'blue';
 }
 
 export const Canvas = ({
   loadContent,
   editMode = true,
+  isSaving,
   onSave,
 }: CanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -44,6 +47,8 @@ export const Canvas = ({
   const [isLandscape, setIsLandscape] = useState(
     window.innerWidth > window.innerHeight,
   );
+  const [isErasing, setIsErasing] = useState(false);
+  // const [tempSave, setTempSave] = useState(canvasRef?.current?.toDataURL());
 
   // Update screen width and orientation dynamically
   useEffect(() => {
@@ -107,6 +112,7 @@ export const Canvas = ({
     let lastY = 0;
 
     const startDrawing = (e: PointerEvent) => {
+      ctx.strokeStyle = isErasing ? '#f0efeb' : 'blue';
       if (e.pointerType !== 'pen' && e.pointerType !== 'mouse') return;
       const rect = canvas.getBoundingClientRect();
       isDrawing = true;
@@ -127,7 +133,8 @@ export const Canvas = ({
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       const pressure = e.pressure || 1.5; // Default pressure if unsupported
-      ctx.lineWidth = Math.max(1, pressure * 2);
+      ctx.lineWidth = Math.max(isErasing ? 20 : 1, pressure * 2);
+
       ctx.lineTo(x, y);
       ctx.stroke();
       lastX = x;
@@ -154,57 +161,63 @@ export const Canvas = ({
       canvas.removeEventListener('pointerup', stopDrawing);
       canvas.removeEventListener('pointerleave', stopDrawing);
     };
-  }, [screenWidth, isLandscape, loadContent, editMode]);
+  }, [screenWidth, isLandscape, loadContent, editMode, isErasing]);
+
+  // useEffect(() => {
+  //   setTempSave(canvasRef.current?.toDataURL() || '');
+  // }, [canvasRef]);
 
   const handleSave = () => {
     onSave(canvasRef);
+    // setTempSave(canvasRef.current?.toDataURL() || '');
   };
 
   const handleErase = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (canvas && ctx) {
-      const scaleFactor = 2; // window.devicePixelRatio || 1;
-
-      const canvasWidth = isLandscape
-        ? screenWidth * A4_RATIO
-        : screenWidth * A4_RATIO;
-      const canvasHeight = isLandscape ? screenWidth / A4_RATIO : screenWidth;
-
-      canvas.width = canvasWidth * scaleFactor;
-      canvas.height = canvasHeight * scaleFactor;
-      canvas.style.width = `${canvasWidth}px`;
-      canvas.style.height = `${canvasHeight}px`;
-
-      ctx.scale(scaleFactor, scaleFactor);
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-
-      ctx.fillStyle = '#f0efeb';
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-      drawGrid(ctx, canvas, 50);
-      // Initialize canvas
-      if (loadContent) {
-        const image = new Image();
-        image.src = loadContent;
-        image.onload = () => {
-          ctx.drawImage(image, 0, 0, canvasWidth, canvasHeight);
-        };
-      } else {
-        ctx.fillStyle = '#f0efeb';
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-        drawGrid(ctx, canvas, 50);
-      }
-    }
+    // const canvas = canvasRef.current;
+    // const ctx = canvas?.getContext('2d');
+    // if (canvas && ctx) {
+    //   const scaleFactor = 2; // window.devicePixelRatio || 1;
+    //   const canvasWidth = isLandscape
+    //     ? screenWidth * A4_RATIO
+    //     : screenWidth * A4_RATIO;
+    //   const canvasHeight = isLandscape ? screenWidth / A4_RATIO : screenWidth;
+    //   canvas.width = canvasWidth * scaleFactor;
+    //   canvas.height = canvasHeight * scaleFactor;
+    //   canvas.style.width = `${canvasWidth}px`;
+    //   canvas.style.height = `${canvasHeight}px`;
+    //   ctx.scale(scaleFactor, scaleFactor);
+    //   ctx.lineJoin = 'round';
+    //   ctx.lineCap = 'round';
+    //   ctx.imageSmoothingEnabled = true;
+    //   ctx.imageSmoothingQuality = 'high';
+    //   ctx.fillStyle = '#f0efeb';
+    //   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    //   drawGrid(ctx, canvas, 50);
+    //   // Initialize canvas
+    //   if (loadContent) {
+    //     const image = new Image();
+    //     image.src = loadContent;
+    //     image.onload = () => {
+    //       ctx.drawImage(image, 0, 0, canvasWidth, canvasHeight);
+    //     };
+    //   } else {
+    //     ctx.fillStyle = '#f0efeb';
+    //     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    //     drawGrid(ctx, canvas, 50);
+    //   }
+    // }
+    setIsErasing(prev => !prev);
+    // setTempSave(canvasRef.current?.toDataURL() || '');
   };
 
   return (
     <div className='flex flex-col gap-2'>
       {editMode && (
         <div className='flex justify-between'>
-          <Button variant='contained' onClick={handleErase}>
+          <Button
+            variant={isErasing ? 'outlined' : 'contained'}
+            onClick={handleErase}
+          >
             <FaEraser size={20} />
           </Button>
           <Button
@@ -212,7 +225,20 @@ export const Canvas = ({
             className='flex gap-2'
             onClick={handleSave}
           >
-            <FaFileExport size={20} /> Save
+            {isSaving ? (
+              <>
+                <CircularProgress
+                  sx={{ color: 'white', marginRight: 2 }}
+                  size={16}
+                  className=' flex text-white w-3 h-3'
+                />{' '}
+                Saving
+              </>
+            ) : (
+              <div className='flex gap-2'>
+                <FaFileExport size={20} /> Save
+              </div>
+            )}
           </Button>
         </div>
       )}

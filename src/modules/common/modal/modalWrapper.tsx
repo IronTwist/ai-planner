@@ -3,19 +3,25 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { AppDispatch } from '@/store/store';
 import { closeModal } from '@/store/reducers/modal-slice';
 
 export type ModalWrapperType = {
+  disableBackdropClick?: boolean;
   open: boolean;
   children: React.ReactNode;
 };
 
 export const ModalWrapper = ({ open, children }: ModalWrapperType) => {
+  const modalName = useAppSelector(state => state.modal.name);
+
   const dispatch = useAppDispatch<AppDispatch>();
   const handleClose = () => {
-    //dispatch close modal
+    if (modalName === 'addNoteModal') {
+      return;
+    }
+
     dispatch(closeModal());
   };
 
@@ -31,13 +37,13 @@ export const ModalWrapper = ({ open, children }: ModalWrapperType) => {
         <Box
           sx={{
             position: 'absolute',
-            top: '30%',
+            top: '20%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             borderRadius: '10px',
             boxShadow: 24,
             width: 'auto',
-            height: '50%',
+            height: '30%',
           }}
         >
           {children}
