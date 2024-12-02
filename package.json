@@ -18,6 +18,7 @@
     "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
+    "@mui/x-charts": "^7.23.0",
     "@pixi/react": "^7.1.2",
     "@reduxjs/toolkit": "^2.3.0",
     "@types/react-redux": "^7.1.34",
