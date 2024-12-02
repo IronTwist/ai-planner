@@ -11,7 +11,6 @@ export const blobRepository = {
 
     const data = await resp.blob();
 
-    console.log('respVercelBlob: ', data);
     return data;
   },
   delete: async (url: string | undefined) => {
