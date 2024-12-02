@@ -1,16 +1,11 @@
 'use client';
 
 import { RandomNumberChart } from '@/modules/UI/components/molecules/random-number-chart';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { logOut } from '@/store/reducers/auth-slice';
-import { AppDispatch } from '@/store/store';
+import { useAppSelector } from '@/store/hooks';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const user = useAppSelector(state => state.auth.user);
-  const dispatch = useAppDispatch<AppDispatch>();
-  const router = useRouter();
 
   return (
     <div className='flex flex-col p-1 mt-24'>
