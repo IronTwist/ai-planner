@@ -170,13 +170,13 @@ export const LogInModal = () => {
 
           setCookie('ai-planner-session', JSON.stringify(userData), 1);
 
+          dispatch(closeModal());
+
           dispatch(
             logIn({
               user: userData,
             }),
           );
-
-          dispatch(closeModal());
 
           router.push(`${window.location.origin}/`);
         }

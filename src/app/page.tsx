@@ -1,5 +1,6 @@
 'use client';
 
+import { RandomNumberChart } from '@/modules/UI/components/molecules/random-number-chart';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logOut } from '@/store/reducers/auth-slice';
 import { AppDispatch } from '@/store/store';
@@ -23,17 +24,14 @@ export default function Home() {
           alt='user'
         /> */}
         {user ? (
-          <div>
-            <h2 className='text-2xl font-bold'>Welcome {user.userName}!</h2>
-            <Link
-              href='/'
-              onClick={async () => {
-                dispatch(logOut());
-                router.push('/');
-              }}
-            >
-              Logout
-            </Link>
+          <div style={{ width: '100%' }} className='flex flex-col gap-4'>
+            <h2 className='text-2xl font-bold'>
+              Welcome {user.userName}! This project is a work in progress
+            </h2>
+
+            <div style={{ width: '100%' }}>
+              <RandomNumberChart />
+            </div>
           </div>
         ) : (
           <div>
