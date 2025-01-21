@@ -4,7 +4,8 @@ export class HemiSync {
   constructor(baseFrequency, beatFrequency) {
     this.baseFrequency = baseFrequency;
     this.beatFrequency = beatFrequency;
-    this.audioContext = new window.AudioContext();
+    this.audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
     this.leftOscillator = null;
     this.rightOscillator = null;
 
