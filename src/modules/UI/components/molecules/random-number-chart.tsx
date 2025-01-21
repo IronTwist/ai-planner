@@ -5,6 +5,14 @@ import React, { useState, useEffect } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 
 export const RandomNumberChart = () => {
+  const [timesGenerated, setTimesGenerated] = useState(0);
+  const [countNumbers, setCountNumbers] = useState({
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+  });
+
   const [chartData, setChartData] = useState<{
     xAxisData: number[];
     seriesData: number[];
@@ -22,6 +30,14 @@ export const RandomNumberChart = () => {
     const intervalId = setInterval(() => {
       if (isPaused) return;
       const randomNumber = Math.round(Math.random() * 100);
+      setTimesGenerated(prevState => prevState + 1);
+
+      if (Object.keys(countNumbers).includes(randomNumber.toString())) {
+        setCountNumbers(prevState => ({
+          ...prevState,
+          [randomNumber]: prevState[randomNumber as keyof typeof prevState] + 1,
+        }));
+      }
 
       setChartData(prevData => {
         if (prevData.xAxisData.length > 50) {
@@ -43,7 +59,7 @@ export const RandomNumberChart = () => {
     }, 200);
 
     return () => clearInterval(intervalId);
-  }, [chartData.seriesData, isPaused]);
+  }, [chartData.seriesData, countNumbers, isPaused]);
 
   return (
     <Box sx={{ width: '100%', color: 'black', backgroundColor: 'white' }}>
@@ -57,12 +73,26 @@ export const RandomNumberChart = () => {
         ]}
         height={300}
       />
-      <Button onClick={() => handlePause()}>
-        {isPaused ? 'Resume' : 'Pause'}
-      </Button>
-      <Button onClick={() => setChartData({ xAxisData: [1], seriesData: [0] })}>
-        Reset
-      </Button>
+      <Box sx={{ gap: 2 }}>
+        <Button onClick={() => handlePause()}>
+          {isPaused ? 'Resume' : 'Pause'}
+        </Button>
+        <Button
+          onClick={() => {
+            setChartData({ xAxisData: [1], seriesData: [0] });
+            setCountNumbers({ 1: 0, 2: 0, 3: 0, 4: 0 });
+            setTimesGenerated(0);
+          }}
+        >
+          Reset
+        </Button>
+        <Box>
+          Frequency of numbers: <b>1</b>: {countNumbers[1]}, <b>2</b>:{' '}
+          {countNumbers[2]}, <b>3</b>: {countNumbers[3]}, <b>4</b>:{' '}
+          {countNumbers[4]}
+        </Box>
+        <Box>Times genrated: {timesGenerated}</Box>
+      </Box>
     </Box>
   );
 };

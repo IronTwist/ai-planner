@@ -1,6 +1,7 @@
 'use client';
 
 import { RandomNumberChart } from '@/modules/UI/components/molecules/random-number-chart';
+import { SoundGenerator } from '@/modules/UI/components/sound-generator';
 import { useAppSelector } from '@/store/hooks';
 import Link from 'next/link';
 
@@ -26,6 +27,7 @@ export default function Home() {
 
             <div style={{ width: '100%' }}>
               <RandomNumberChart />
+              <SoundGenerator />
             </div>
           </div>
         ) : (
