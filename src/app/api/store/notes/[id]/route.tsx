@@ -93,7 +93,11 @@ export async function PUT(req: Request) {
     url,
   };
 
-  await noteRef.update(noteData);
+  try {
+    await noteRef.update(noteData);
+  } catch (error) {
+    return NextResponse.json({ data: null, error: error });
+  }
 
   return NextResponse.json({ data: noteRef, error: null });
 }
