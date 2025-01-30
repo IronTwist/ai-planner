@@ -23,7 +23,7 @@ import { NoSsr } from '@mui/material';
 // import { protectedRoutes } from '@/middleware';
 // import { ModalWrapper } from '@/modules/common/modal/modalWrapper';
 
-const pages = ['Home', 'Notes'];
+const pages = ['Home', 'Notes', 'Push-ups App'];
 const settings = ['Profile', 'Logout'];
 // const allowOnlyOnRoutes = protectedRoutes;
 
@@ -54,6 +54,10 @@ function Navigation() {
 
     if (page === 'Home') {
       router.push(`${window.location.origin}/`);
+    }
+
+    if (page === 'Push-ups App') {
+      router.push(`${window.location.origin}/push-ups-app`);
     }
   };
 
