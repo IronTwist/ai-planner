@@ -61,6 +61,13 @@ export const RandomNumberChart = () => {
     return () => clearInterval(intervalId);
   }, [chartData.seriesData, countNumbers, isPaused]);
 
+  useEffect(() => {
+    if (timesGenerated === 20) {
+      handlePause();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timesGenerated]);
+
   return (
     <Box sx={{ width: '100%', color: 'black', backgroundColor: 'white' }}>
       <h2>Random Number Chart: 50 numbers generated at 200ms</h2>
