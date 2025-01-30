@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
   clearCSVFile();
 
-  rows.forEach((row: string | Uint8Array<ArrayBufferLike>) => {
+  rows.forEach((row: string) => {
     console.log('row: ', row);
     if (!fs.existsSync(filePath)) {
       fs.writeFileSync(filePath, `${row}\n`);

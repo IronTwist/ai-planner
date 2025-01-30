@@ -1,13 +1,7 @@
 'use client';
 
 import { useAppSelector } from '@/store/hooks';
-import {
-  ChangeEvent,
-  SyntheticEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 export default function PushUpsApp() {
   const user = useAppSelector(state => state.auth.user);
@@ -28,7 +22,7 @@ export default function PushUpsApp() {
     }[];
     count: number;
   }>();
-  const [selectedProgram, setSelectedProgram] = useState({
+  const [selectedProgram] = useState({
     seriesLevel: 1,
     set1: 10,
     set2: 9,
@@ -43,7 +37,7 @@ export default function PushUpsApp() {
     selectedProgram.set1,
   );
   const [onBreak, setOnBreak] = useState(false);
-  const [breakTime, setBreakTime] = useState(selectedProgram.breakTime);
+  const [breakTime] = useState(selectedProgram.breakTime);
   const [breakTimer, setBreakTimer] = useState(selectedProgram.breakTime);
   const [disabledForASecond, setDisabledForASecond] = useState(false);
   const fileInputRef = useRef(null);

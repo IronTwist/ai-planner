@@ -17,6 +17,7 @@ const updateTotalPushups = (name: string, pushups: number) => {
     console.log('row-split: ', row.split(','));
     const [rowName, programLevel, set1, set2, set3, set4, set5] =
       row.split(',');
+    console.log('Program level: ', programLevel);
     if (rowName === name)
       total +=
         parseInt(set1) +
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE() {
   // fs.unlinkSync(filePath, (err) => {
   //     if (err){
   //         return NextResponse.json({ error: err})
