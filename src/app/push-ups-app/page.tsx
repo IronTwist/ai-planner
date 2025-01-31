@@ -110,7 +110,7 @@ export default function PushUpsApp() {
       },
     };
 
-    const resp = await fetch('http://127.0.0.1:3000/api/pushups/', {
+    const resp = await fetch('http://127.0.0.1:3000/api/pushups', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
