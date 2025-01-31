@@ -1,7 +1,7 @@
 'use client';
 
 import { useAppSelector } from '@/store/hooks';
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { pushupsRepository } from '../repositories/pushups';
 import { FaArrowsRotate, FaDeleteLeft } from 'react-icons/fa6';
 
@@ -68,7 +68,7 @@ export default function PushUpsApp() {
   const [breakTime, setBreakTime] = useState(selectedProgram.breakTime);
   const [breakTimer, setBreakTimer] = useState(selectedProgram.breakTime);
   const [disabledForASecond, setDisabledForASecond] = useState(false);
-  const fileInputRef = useRef(null);
+  // const fileInputRef = useRef(null);
 
   const handleChangeProgram = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedLevel = parseInt(event.target.value, 10);
@@ -187,34 +187,34 @@ export default function PushUpsApp() {
     URL.revokeObjectURL(url);
   };
 
-  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event?.target?.files?.[0];
-    if (!file) return;
+  // const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  //   const file = event?.target?.files?.[0];
+  //   if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async e => {
-      const text = e.target?.result;
-      if (typeof text === 'string') {
-        const rows = text.split('\n').slice(1); // Skip header
-        console.log('upload: ', rows);
+  //   const reader = new FileReader();
+  //   reader.onload = async e => {
+  //     const text = e.target?.result;
+  //     if (typeof text === 'string') {
+  //       const rows = text.split('\n').slice(1); // Skip header
+  //       console.log('upload: ', rows);
 
-        if (rows.length > 0) {
-          const resp = await fetch('/api/pushups/load', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ rows }),
-          });
+  //       if (rows.length > 0) {
+  //         const resp = await fetch('/api/pushups/load', {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify({ rows }),
+  //         });
 
-          if (resp.status === 200) {
-            loadData();
-          }
-        }
-      }
-    };
-    reader.readAsText(file);
-  };
+  //         if (resp.status === 200) {
+  //           loadData();
+  //         }
+  //       }
+  //     }
+  //   };
+  //   reader.readAsText(file);
+  // };
 
   const removeWorkout = async (id: string) => {
     await pushupsRepository.removeWorkout(user, id);
@@ -229,7 +229,7 @@ export default function PushUpsApp() {
   useEffect(() => {
     const getData = setTimeout(() => {
       loadData();
-    }, 1000);
+    }, 5000);
 
     return () => clearTimeout(getData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -354,8 +354,8 @@ export default function PushUpsApp() {
         </tbody>
       </table>
 
-      <div className='flex gap-2'>
-        <div>
+      <div className='flex gap-2 mt-3'>
+        {/* <div>
           <input
             id='fileUpload'
             type='file'
@@ -370,7 +370,7 @@ export default function PushUpsApp() {
           >
             Upload from device
           </label>
-        </div>
+        </div> */}
         <div
           onClick={downloadCSV}
           className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'

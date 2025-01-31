@@ -2,37 +2,43 @@ import { NextResponse } from 'next/server';
 import { adminAuth, adminFirestore } from '@/service/adminFirebase';
 
 export async function GET(request: Request) {
-  const id = request.url.split('/').pop();
+  // const id = request.url.split('/').pop();
 
   const authHeader = request.headers.get('Authorization') || '';
   const token = authHeader.replace('Bearer ', '');
 
-  if (!id) {
-    return NextResponse.json({ data: null, error: 'No id provided' });
+  // if (!id) {
+  //   return NextResponse.json({ data: null, error: 'No id provided' });
+  // }
+
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    const userId = decodedToken.uid;
+
+    const pushupsRef = adminFirestore
+      .collection('notes')
+      .doc(userId)
+      .collection('pushups')
+      .orderBy('date', 'desc');
+
+    const resp = await pushupsRef.get();
+
+    const pushups = resp.docs.map(doc => {
+      const pushData = doc.data();
+      pushData.id = doc.id;
+      return pushData;
+    });
+
+    console.log('PushData--------> ', pushups);
+
+    if (!pushups) {
+      return NextResponse.json({ data: [], error: 'Data not found' });
+    }
+
+    return NextResponse.json({ data: pushups, error: null });
+  } catch (error) {
+    return NextResponse.json({ data: [], error });
   }
-
-  const decodedToken = await adminAuth.verifyIdToken(token);
-  const userId = decodedToken.uid;
-
-  const pushupsRef = adminFirestore
-    .collection('notes')
-    .doc(userId)
-    .collection('pushups')
-    .orderBy('date', 'desc');
-
-  const resp = await pushupsRef.get();
-
-  const pushups = resp.docs.map(doc => {
-    const pushData = doc.data();
-    pushData.id = doc.id;
-    return pushData;
-  });
-
-  if (!pushups) {
-    return NextResponse.json({ data: null, error: 'Data not found' });
-  }
-
-  return NextResponse.json({ data: pushups, error: null });
 }
 
 export async function POST(request: Request) {
