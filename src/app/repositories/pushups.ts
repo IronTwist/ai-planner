@@ -49,9 +49,7 @@ export const pushupsRepository = {
       },
       body: JSON.stringify({ id }),
     });
-    const data = await resp.json();
-    console.log('Am sters: ', data);
-    return data;
+    await resp.json();
   },
   //   getNote: async (user: User, id: string) => {
   //     const resp = await fetch(`/api/store/notes/${id}`, {
