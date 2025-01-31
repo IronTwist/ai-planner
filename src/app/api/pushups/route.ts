@@ -117,7 +117,13 @@ export async function POST(request: Request) {
     const row = `${name},${programLevel},${set1},${set2},${set3},${set4},${set5},${totalPushups},${date}\n`;
     fs.appendFileSync(filePath, row);
 
-    return NextResponse.json({ message: 'Data saved successfully.' });
+    const response = NextResponse.json({ message: 'Data saved successfully.' });
+
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'POST');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+
+    return response;
   }
 }
 
