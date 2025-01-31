@@ -64,7 +64,28 @@ export async function GET(request: Request) {
   const test = toArrOfObjects(data);
   console.log('Test: ', test);
 
-  return NextResponse.json({ data: toArrOfObjects(data), count: data.length });
+  const response = NextResponse.json({
+    data: toArrOfObjects(data),
+    count: data.length,
+  });
+
+  // ✅ Fix CORS
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+
+  return response;
+}
+
+// ✅ Handle OPTIONS (Preflight Request)
+export function OPTIONS() {
+  const response = new NextResponse(null, { status: 204 });
+
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+
+  return response;
 }
 
 export async function POST(request: Request) {
