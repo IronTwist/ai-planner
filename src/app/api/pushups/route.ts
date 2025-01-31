@@ -96,33 +96,25 @@ export async function POST(request: Request) {
       pushups: { set1, set2, set3, set4, set5 },
     } = await request.json();
 
-    if (!name) {
-      return NextResponse.json({ message: 'Invalid data.' }, { status: 400 });
-    }
-
-    const total = set1 + set2 + set3 + set4 + set5;
     const date = new Date().toISOString();
+    const total = set1 + set2 + set3 + set4 + set5;
 
-    console.log('Saving to file:', filePath);
-
-    // Ensure the directory exists
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    if (!name) {
+      return NextResponse.json({ message: 'Invalid data.' });
     }
 
-    // Prepare CSV row
-    const row = `${name},${programLevel},${set1},${set2},${set3},${set4},${set5},${total},${date}\n`;
-
-    // If file doesn't exist, create it with a header
     if (!fs.existsSync(filePath)) {
       fs.writeFileSync(
         filePath,
-        'Name,Program Level,Set1,Set2,Set3,Set4,Set5,Total Pushups,Date\n',
+        `${name},${programLevel},${set1},${set2},${set3},${set4},${set5},${total},${date}\n`,
       );
+
+      return NextResponse.json({ message: 'Data saved successfully.' });
     }
 
-    // Append new data
+    const totalPushups = updateTotalPushups(name, total);
+
+    const row = `${name},${programLevel},${set1},${set2},${set3},${set4},${set5},${totalPushups},${date}\n`;
     fs.appendFileSync(filePath, row);
 
     return new NextResponse(
