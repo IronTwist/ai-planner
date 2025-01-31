@@ -177,7 +177,6 @@ export default function PushUpsApp() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
       },
     })
       .then(data => data.json())
@@ -193,6 +192,7 @@ export default function PushUpsApp() {
     }, 1000);
 
     return () => clearTimeout(getData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
