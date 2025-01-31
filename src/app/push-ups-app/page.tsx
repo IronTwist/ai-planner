@@ -110,7 +110,7 @@ export default function PushUpsApp() {
       },
     };
 
-    const resp = await fetch('http://localhost:3000/api/pushups/', {
+    const resp = await fetch('http://127.0.0.1:3000/api/pushups/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ export default function PushUpsApp() {
         console.log('upload: ', rows);
 
         if (rows.length > 0) {
-          const resp = await fetch('http://localhost:3000/api/pushups/load', {
+          const resp = await fetch('http://127.0.0.1:3000/api/pushups/load', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -173,9 +173,11 @@ export default function PushUpsApp() {
   };
 
   const loadData = () => {
-    fetch(`http://localhost:3000/api/pushups?name=${user?.userName}`, {
+    fetch(`http://127.0.0.1:3000/api/pushups?name=${user?.userName}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
       },
     })
       .then(data => data.json())
