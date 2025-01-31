@@ -1,149 +1,104 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const filePath = path.join(process.cwd(), 'data', 'data.csv');
-
-// Ensure the directory exists
-const dirPath = path.dirname(filePath);
-if (!fs.existsSync(dirPath)) {
-  fs.mkdirSync(dirPath, { recursive: true });
-}
-
-const updateTotalPushups = (name: string, pushups: number) => {
-  const data = fs.readFileSync(filePath, 'utf8').split('\n').filter(Boolean);
-  let total = 0;
-  data.forEach(row => {
-    console.log('row-split: ', row.split(','));
-    const [rowName, programLevel, set1, set2, set3, set4, set5] =
-      row.split(',');
-    console.log('Program level: ', programLevel);
-    if (rowName === name)
-      total +=
-        parseInt(set1) +
-        parseInt(set2) +
-        parseInt(set3) +
-        parseInt(set4) +
-        parseInt(set5);
-  });
-
-  return total + pushups;
-};
-
-const toArrOfObjects = (data: string[]) => {
-  return data.map(row => {
-    const split = row.split(',');
-
-    return {
-      name: split[0],
-      programLevel: split[1],
-      pushups: {
-        set1: split[2],
-        set2: split[3],
-        set3: split[4],
-        set4: split[5],
-        set5: split[6],
-      },
-      totalPushups: split[7],
-      date: split[8],
-    };
-  });
-};
+import { adminAuth, adminFirestore } from '@/service/adminFirebase';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const name = searchParams.get('name') as string;
-  console.log('name: ', name);
+  const id = request.url.split('/').pop();
 
-  const data = fs
-    .readFileSync(filePath, 'utf8')
-    .split('\n')
-    .filter(Boolean)
-    .filter(row => (name ? row.split(',')[0] === name : row));
-  console.log('data: ', data);
-  const test = toArrOfObjects(data);
-  console.log('Test: ', test);
+  const authHeader = request.headers.get('Authorization') || '';
+  const token = authHeader.replace('Bearer ', '');
 
-  const response = NextResponse.json({
-    data: toArrOfObjects(data),
-    count: data.length,
+  if (!id) {
+    return NextResponse.json({ data: null, error: 'No id provided' });
+  }
+
+  const decodedToken = await adminAuth.verifyIdToken(token);
+  const userId = decodedToken.uid;
+
+  const pushupsRef = adminFirestore
+    .collection('notes')
+    .doc(userId)
+    .collection('pushups')
+    .orderBy('date', 'desc');
+
+  const resp = await pushupsRef.get();
+
+  const pushups = resp.docs.map(doc => {
+    const pushData = doc.data();
+    pushData.id = doc.id;
+    return pushData;
   });
 
-  // ✅ Fix CORS
-  response.headers.set('Access-Control-Allow-Origin', '*');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+  if (!pushups) {
+    return NextResponse.json({ data: null, error: 'Data not found' });
+  }
 
-  return response;
-}
-
-// ✅ Handle OPTIONS (Preflight Request)
-export function OPTIONS() {
-  const response = new NextResponse(null, { status: 204 });
-
-  response.headers.set('Access-Control-Allow-Origin', '*');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
-
-  return response;
+  return NextResponse.json({ data: pushups, error: null });
 }
 
 export async function POST(request: Request) {
+  const { name, programLevel, set1, set2, set3, set4, set5, date, total } =
+    await request.json();
+
+  if (!name) {
+    return NextResponse.json({ message: 'Invalid data.' });
+  }
+
+  const authHeader = request.headers.get('Authorization') || '';
+  const token = authHeader.replace('Bearer ', '');
+
   try {
-    const {
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    const userId = decodedToken.uid;
+
+    const workoutData = {
+      date,
       name,
+      total,
       programLevel,
-      pushups: { set1, set2, set3, set4, set5 },
-    } = await request.json();
+      set1,
+      set2,
+      set3,
+      set4,
+      set5,
+    };
 
-    const date = new Date().toISOString();
-    const total = set1 + set2 + set3 + set4 + set5;
+    const noteRef = adminFirestore
+      .collection('notes')
+      .doc(userId)
+      .collection('pushups')
+      .doc(); // Auto-generate a unique note ID
 
-    if (!name) {
-      return NextResponse.json({ message: 'Invalid data.' });
-    }
+    await noteRef.set(workoutData);
 
-    if (!fs.existsSync(filePath)) {
-      fs.writeFileSync(
-        filePath,
-        `${name},${programLevel},${set1},${set2},${set3},${set4},${set5},${total},${date}\n`,
-      );
-
-      return NextResponse.json({ message: 'Data saved successfully.' });
-    }
-
-    const totalPushups = updateTotalPushups(name, total);
-
-    const row = `${name},${programLevel},${set1},${set2},${set3},${set4},${set5},${totalPushups},${date}\n`;
-    fs.appendFileSync(filePath, row);
-
-    return new NextResponse(
-      JSON.stringify({ message: 'Data saved successfully.' }),
-      {
-        status: 200,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
-        },
-      },
-    );
+    return NextResponse.json({ data: { workoutData, noteRef }, error: null });
   } catch (error) {
-    console.error('Error saving data:', error);
-    return NextResponse.json({ message: 'Server error.' }, { status: 500 });
+    return NextResponse.json({ message: error }, { status: 500 });
   }
 }
 
-export async function DELETE() {
-  // fs.unlinkSync(filePath, (err) => {
-  //     if (err){
-  //         return NextResponse.json({ error: err})
-  //     }
+export async function DELETE(request: Request) {
+  const { id } = await request.json();
 
-  //     return NextResponse.json({ message: "File deleted sucessfully!"})
-  // })
+  const authHeader = request.headers.get('Authorization') || '';
+  const token = authHeader.replace('Bearer ', '');
 
-  fs.unlinkSync(filePath);
+  if (!id) {
+    return NextResponse.json({ data: null, error: 'No id provided' });
+  }
 
-  NextResponse.json({ message: 'File deleted sucessfully!' });
+  const decodedToken = await adminAuth.verifyIdToken(token);
+  const userId = decodedToken.uid;
+
+  const resp = await adminFirestore
+    .collection('notes')
+    .doc(userId)
+    .collection('pushups')
+    .doc(id)
+    .delete();
+
+  if (!resp) {
+    return NextResponse.json({ data: null, error: 'Note not found' });
+  }
+
+  return NextResponse.json({ message: 'Delete row' });
 }

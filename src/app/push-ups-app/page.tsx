@@ -1,46 +1,80 @@
 'use client';
 
 import { useAppSelector } from '@/store/hooks';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { pushupsRepository } from '../repositories/pushups';
+import { FaArrowsRotate, FaDeleteLeft } from 'react-icons/fa6';
 
-export default function PushUpsApp() {
-  const user = useAppSelector(state => state.auth.user);
-
-  const [data, setData] = useState<{
-    data: {
-      date: string;
-      name: string;
-      totalPushups: string;
-      programLevel: string;
-      pushups: {
-        set1: string;
-        set2: string;
-        set3: string;
-        set4: string;
-        set5: string;
-      };
-    }[];
-    count: number;
-  }>();
-  const [selectedProgram] = useState({
+const programs = [
+  {
     seriesLevel: 1,
     set1: 10,
     set2: 9,
     set3: 8,
     set4: 8,
     set5: 9,
+    total: 44,
     breakTime: 45,
-  });
+  },
+  {
+    seriesLevel: 2,
+    set1: 12,
+    set2: 10,
+    set3: 9,
+    set4: 9,
+    set5: 10,
+    total: 50,
+    breakTime: 60,
+  },
+  {
+    seriesLevel: 3,
+    set1: 15,
+    set2: 12,
+    set3: 10,
+    set4: 10,
+    set5: 12,
+    total: 59,
+    breakTime: 75,
+  },
+];
+
+export type DataType = {
+  data: {
+    id: string;
+    date: number;
+    name: string;
+    total: number;
+    programLevel: number;
+    set1: number;
+    set2: number;
+    set3: number;
+    set4: number;
+    set5: number;
+  }[];
+  count: number;
+};
+
+export default function PushUpsApp() {
+  const user = useAppSelector(state => state.auth.user);
+
+  const [data, setData] = useState<DataType>();
+  const [selectedProgram, setSelectedProgram] = useState(programs[0]);
   const [currentSet, setCurrentSet] = useState(1);
   const [targetPushups, setTargetPushups] = useState(selectedProgram.set1);
   const [remainingPushups, setRemainingPushups] = useState(
     selectedProgram.set1,
   );
   const [onBreak, setOnBreak] = useState(false);
-  const [breakTime] = useState(selectedProgram.breakTime);
+  const [breakTime, setBreakTime] = useState(selectedProgram.breakTime);
   const [breakTimer, setBreakTimer] = useState(selectedProgram.breakTime);
   const [disabledForASecond, setDisabledForASecond] = useState(false);
   const fileInputRef = useRef(null);
+
+  const handleChangeProgram = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedLevel = parseInt(event.target.value, 10);
+    const program = programs.find(p => p.seriesLevel === selectedLevel);
+    if (program) setSelectedProgram(program);
+  };
 
   useEffect(() => {
     if (onBreak && breakTimer > 0) {
@@ -89,36 +123,46 @@ export default function PushUpsApp() {
     }, 50);
   };
 
-  const startAgain = () => {
+  const startAgain = useCallback(() => {
     setCurrentSet(1);
     setTargetPushups(selectedProgram.set1);
     setRemainingPushups(selectedProgram.set1);
-  };
+    setBreakTime(selectedProgram.breakTime);
+    setBreakTimer(selectedProgram.breakTime);
+  }, [selectedProgram.breakTime, selectedProgram.set1]);
+
+  useEffect(() => {
+    console.log('selectedProgram: ', selectedProgram);
+    startAgain();
+  }, [selectedProgram, startAgain]);
 
   const handleSubmit = async () => {
     const { set1, set2, set3, set4, set5, seriesLevel } = selectedProgram;
-    console.log('Submit username: ', user?.userName);
-    const data = {
-      name: user?.userName,
+    let latestMaxPushUps = 0;
+
+    if (data?.count) {
+      latestMaxPushUps = data?.data[0].total;
+    } else {
+      latestMaxPushUps = 0;
+    }
+
+    const workout = {
+      name: user?.userName as string,
       programLevel: seriesLevel,
-      pushups: {
-        set1,
-        set2,
-        set3,
-        set4,
-        set5,
-      },
+      set1,
+      set2,
+      set3,
+      set4,
+      set5,
+      total: latestMaxPushUps
+        ? latestMaxPushUps + selectedProgram.total
+        : selectedProgram.total,
+      date: Date.now(),
     };
 
-    const resp = await fetch('http://127.0.0.1:3000/api/pushups', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const resp = await pushupsRepository.addWorkout(user, workout);
 
-    if (resp.status === 200) {
+    if (resp) {
       loadData();
     }
   };
@@ -130,7 +174,7 @@ export default function PushUpsApp() {
       'Name,Program Level,Set1,Set2,Set3,Set4,Set5,Total Pushups,Date\n';
     const csvRows = data.data.map(
       row =>
-        `${user?.userName},${selectedProgram.seriesLevel},${row.pushups.set1},${row.pushups.set2},${row.pushups.set3},${row.pushups.set4},${row.pushups.set5},${row.totalPushups},${new Date().toISOString()}`,
+        `${user?.userName},${selectedProgram.seriesLevel},${row.set1},${row.set2},${row.set3},${row.set4},${row.set5},${row.total},${new Date().toISOString()}`,
     );
 
     const csvContent = csvHeader + csvRows.join('\n');
@@ -155,7 +199,7 @@ export default function PushUpsApp() {
         console.log('upload: ', rows);
 
         if (rows.length > 0) {
-          const resp = await fetch('http://127.0.0.1:3000/api/pushups/load', {
+          const resp = await fetch('/api/pushups/load', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -172,18 +216,14 @@ export default function PushUpsApp() {
     reader.readAsText(file);
   };
 
-  const loadData = () => {
-    fetch(`http://127.0.0.1:3000/api/pushups?name=${user?.userName}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(data => data.json())
-      .then(data => {
-        console.log('Data test: ', data);
-        setData(data);
-      });
+  const removeWorkout = async (id: string) => {
+    await pushupsRepository.removeWorkout(user, id);
+    await loadData();
+  };
+
+  const loadData = async () => {
+    const data = await pushupsRepository.getSeries(user);
+    setData({ data: data.data, count: data.data.length });
   };
 
   useEffect(() => {
@@ -196,10 +236,36 @@ export default function PushUpsApp() {
   }, []);
 
   return (
-    <div className='flex flex-col items-center justify-center min-h-screen p-4 gap-6 pt-24 bg-cyan-900'>
-      <h1 className='text-2xl font-bold mb-4'>Push-Up Tracker</h1>
-      <h2 className='text-xl mb-4'>
-        Set {currentSet}: Target Pushups: {targetPushups}
+    <div className='flex flex-col items-center justify-center min-h-screen p-4 pt-24 bg-cyan-900 bg-cover bg-[url("/images/pushups.webp")]'>
+      <h1 className='text-2xl font-bold mb-4'>
+        Push Ups Workout Tracker{' '}
+        <button className='my-4' onClick={async () => await loadData()}>
+          {<FaArrowsRotate />}
+        </button>
+      </h1>
+      <label htmlFor='programs' className='block text-lg font-medium mb-2'>
+        Select Level:
+      </label>
+      <select
+        id='programs'
+        value={selectedProgram.seriesLevel}
+        onChange={handleChangeProgram}
+        className='p-2 border rounded-md text-black'
+      >
+        {programs.map(program => (
+          <option
+            className='text-black'
+            key={program.seriesLevel}
+            value={program.seriesLevel}
+          >
+            {`seriesLevel ${program.seriesLevel} (${program.set1}+${program.set2}+${program.set3}+${program.set4}+${program.set5}=${program.total})`}
+          </option>
+        ))}
+      </select>
+
+      <h2 className='text-xl mb-4 mt-4 p-4 border rounded-md bg-blue-600'>
+        Set {currentSet}: Target Pushups: {targetPushups}{' '}
+        <p>Break Time: {selectedProgram.breakTime} seconds</p>
       </h2>
 
       {!onBreak ? (
@@ -234,20 +300,29 @@ export default function PushUpsApp() {
       )}
 
       {remainingPushups === 0 && currentSet === 5 && (
-        <>
+        <div className='flex gap-2'>
           <button
             onClick={handleSubmit}
-            className='mt-6 px-4 py-2 border border-black bg-green-500 text-white rounded hover:bg-green-600'
+            className='mt-6 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
           >
             Save workout
           </button>
-          <button onClick={startAgain}>Start again</button>
-        </>
+          <button
+            className='mt-6 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
+            onClick={startAgain}
+          >
+            Start again
+          </button>
+        </div>
       )}
-      <table className='w-full border-collapse border-2 border-black text-2xl text-cyan-800 bg-slate-400'>
+
+      <table className='w-full mt-8 border-collapse border-2 border-black text-1xl text-cyan-800 bg-slate-400'>
         <thead className='bg-gray-300'>
           <tr className='border-2 border-black'>
             <th className='border-2 border-black px-4 py-2 text-left'>Date</th>
+            <th className='border-2 border-black px-4 py-2 text-left'>
+              Workout Level
+            </th>
             <th className='border-2 border-black px-4 py-2 text-left'>Total</th>
           </tr>
         </thead>
@@ -256,10 +331,23 @@ export default function PushUpsApp() {
             data.data.map((row, index) => (
               <tr key={index} className='border-2 border-black'>
                 <td className='border-2 border-black px-4 py-2'>
-                  {formatDate(row.date)}
+                  {formatDate(new Date(row.date).toISOString())}
                 </td>
                 <td className='border-2 border-black px-4 py-2'>
-                  {row.totalPushups}
+                  {`${row.programLevel} (${row.set1}+${row.set2}+${row.set3}+${row.set4}+${row.set5}=${row.set1 + row.set2 + row.set3 + row.set4 + row.set5})`}
+                </td>
+                <td className='border-2 border-black px-4 py-2'>
+                  <div className='flex items-center justify-between gap-2'>
+                    {row.total}
+                    {
+                      <FaDeleteLeft
+                        onClick={() => {
+                          removeWorkout(row.id);
+                        }}
+                        size={30}
+                      />
+                    }
+                  </div>
                 </td>
               </tr>
             ))}
@@ -297,15 +385,19 @@ export default function PushUpsApp() {
 const formatDate = (isoString: string) => {
   const date = new Date(isoString);
 
-  const options: Intl.DateTimeFormatOptions = {
+  // Format date: "31 January 2025"
+  const formattedDate = date.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
+  });
+
+  // Format time: "13:35"
+  const formattedTime = date.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
-  };
+    hour12: false, // Use 24-hour format
+  });
 
-  return date.toLocaleString('en-GB', options).replace(',', '');
+  return `${formattedDate} - ${formattedTime}`;
 };
