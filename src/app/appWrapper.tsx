@@ -172,6 +172,18 @@ export const AppWrapper = ({
     });
 
     preloadImages();
+
+    // Check if Service Workers are supported by the browser
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/service-worker.js') // Register the service worker
+        .then(registration => {
+          console.log('Service Worker registered:', registration);
+        })
+        .catch(error => {
+          console.log('Service Worker registration failed:', error);
+        });
+    }
   }, []);
 
   return (
