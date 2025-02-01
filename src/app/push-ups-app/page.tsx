@@ -231,9 +231,15 @@ export default function PushUpsApp() {
   };
 
   useEffect(() => {
+    if (data?.data[0]?.programLevel) {
+      setSelectedProgram(() => programs[data.data[0].programLevel - 1]);
+    }
+  }, [data]);
+
+  useEffect(() => {
     const getData = setTimeout(async () => {
       await loadData();
-    }, 50);
+    }, 500);
 
     return () => clearTimeout(getData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -267,16 +273,20 @@ export default function PushUpsApp() {
         ))}
       </select>
 
-      <h2 className='text-xl mb-4 mt-4 p-4 border rounded-md bg-blue-600'>
-        Set {currentSet}: Target Pushups: {targetPushups}{' '}
-        <p>Break Time: {selectedProgram.breakTime} seconds</p>
-        <p>Current total: {currentPushupsTotal}</p>
-        <button
-          onClick={handleGiveUpSubmit}
-          className=' px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
-        >
-          Give up
-        </button>
+      <h2 className='flex text-xl gap-3 mb-4 mt-4 p-4 border rounded-md bg-blue-600'>
+        <div>
+          Set {currentSet}: Target Pushups: {targetPushups}{' '}
+          <p>Break Time: {selectedProgram.breakTime} seconds</p>
+          <p>Current total: {currentPushupsTotal}</p>
+        </div>
+        {remainingPushups !== 0 && (
+          <button
+            onClick={handleGiveUpSubmit}
+            className='h-14 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
+          >
+            Give up
+          </button>
+        )}
       </h2>
 
       {!onBreak ? (
@@ -302,10 +312,10 @@ export default function PushUpsApp() {
             className='w-80 h-80 px-6 py-2 border border-y-8 border-x-8 border-blue-500 bg-yellow-500 text-white rounded-full hover:bg-yellow-600'
           >
             <h2 className='text-xl mb-4 text-cyan-950'>Break Time!</h2>
-            <h2 className='text-9xl font-bold mb-6 text-cyan-950'>
-              {breakTimer} <span className='text-2xl -ml-8'>sec</span>
+            <h2 className='text-8xl font-bold mb-6 text-cyan-950'>
+              {breakTimer} <span className='text-2xl -ml-6'>sec</span>
             </h2>
-            Click to continue!
+            Touch to continue!
           </button>
         </div>
       )}
