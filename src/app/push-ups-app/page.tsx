@@ -4,39 +4,9 @@ import { useAppSelector } from '@/store/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { pushupsRepository } from '../repositories/pushups';
 import { FaArrowsRotate, FaDeleteLeft } from 'react-icons/fa6';
+import { levels } from '@/utils';
 
-const programs = [
-  {
-    seriesLevel: 1,
-    set1: 10,
-    set2: 9,
-    set3: 8,
-    set4: 8,
-    set5: 9,
-    total: 44,
-    breakTime: 45,
-  },
-  {
-    seriesLevel: 2,
-    set1: 12,
-    set2: 10,
-    set3: 9,
-    set4: 9,
-    set5: 10,
-    total: 50,
-    breakTime: 60,
-  },
-  {
-    seriesLevel: 3,
-    set1: 15,
-    set2: 12,
-    set3: 10,
-    set4: 10,
-    set5: 12,
-    total: 59,
-    breakTime: 75,
-  },
-];
+const programs = levels;
 
 export type DataType = {
   data: {
@@ -69,6 +39,7 @@ export default function PushUpsApp() {
   const [breakTimer, setBreakTimer] = useState(selectedProgram.breakTime);
   const [disabledForASecond, setDisabledForASecond] = useState(false);
   // const fileInputRef = useRef(null);
+  const [currentPushupsTotal, setCurrentPushupsTotal] = useState(0);
 
   const handleChangeProgram = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedLevel = parseInt(event.target.value, 10);
@@ -107,6 +78,7 @@ export default function PushUpsApp() {
   const handlePushup = () => {
     setDisabledForASecond(true);
     if (remainingPushups > 0) {
+      setCurrentPushupsTotal(prev => prev + 1);
       setRemainingPushups(prev => prev - 1);
     }
 
@@ -129,6 +101,7 @@ export default function PushUpsApp() {
     setRemainingPushups(selectedProgram.set1);
     setBreakTime(selectedProgram.breakTime);
     setBreakTimer(selectedProgram.breakTime);
+    setCurrentPushupsTotal(0);
   }, [selectedProgram.breakTime, selectedProgram.set1]);
 
   useEffect(() => {
@@ -157,6 +130,37 @@ export default function PushUpsApp() {
       total: latestMaxPushUps
         ? latestMaxPushUps + selectedProgram.total
         : selectedProgram.total,
+      date: Date.now(),
+    };
+
+    const resp = await pushupsRepository.addWorkout(user, workout);
+
+    if (resp) {
+      loadData();
+    }
+  };
+
+  const handleGiveUpSubmit = async () => {
+    const { set1, set2, set3, set4, set5, seriesLevel } = selectedProgram;
+    let latestMaxPushUps = 0;
+
+    if (data?.count) {
+      latestMaxPushUps = data?.data[0].total;
+    } else {
+      latestMaxPushUps = 0;
+    }
+
+    const workout = {
+      name: user?.userName as string,
+      programLevel: seriesLevel,
+      set1,
+      set2,
+      set3,
+      set4,
+      set5,
+      total: latestMaxPushUps
+        ? latestMaxPushUps + currentPushupsTotal
+        : currentPushupsTotal,
       date: Date.now(),
     };
 
@@ -227,9 +231,9 @@ export default function PushUpsApp() {
   };
 
   useEffect(() => {
-    const getData = setTimeout(() => {
-      loadData();
-    }, 5000);
+    const getData = setTimeout(async () => {
+      await loadData();
+    }, 50);
 
     return () => clearTimeout(getData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -266,6 +270,13 @@ export default function PushUpsApp() {
       <h2 className='text-xl mb-4 mt-4 p-4 border rounded-md bg-blue-600'>
         Set {currentSet}: Target Pushups: {targetPushups}{' '}
         <p>Break Time: {selectedProgram.breakTime} seconds</p>
+        <p>Current total: {currentPushupsTotal}</p>
+        <button
+          onClick={handleGiveUpSubmit}
+          className=' px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
+        >
+          Give up
+        </button>
       </h2>
 
       {!onBreak ? (
