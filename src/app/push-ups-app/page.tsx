@@ -106,7 +106,6 @@ export default function PushUpsApp() {
   }, [selectedProgram.breakTime, selectedProgram.set1]);
 
   useEffect(() => {
-    console.log('selectedProgram: ', selectedProgram);
     startAgain();
   }, [selectedProgram, startAgain]);
 
@@ -142,6 +141,11 @@ export default function PushUpsApp() {
   };
 
   const handleGiveUpSubmit = async () => {
+    const isConfirmed = window.confirm('Are you sure you want to giveup?');
+    if (!isConfirmed) {
+      return;
+    }
+
     const { set1, set2, set3, set4, set5, seriesLevel } = selectedProgram;
     let latestMaxPushUps = 0;
 
@@ -222,6 +226,15 @@ export default function PushUpsApp() {
   // };
 
   const removeWorkout = async (id: string) => {
+    const selectedRow = data?.data.filter(row => row.id === id);
+    const workoutInfo = `${formatDate(new Date(selectedRow?.[0].date ? selectedRow[0].date : 'now').toISOString())} Level ${selectedRow?.[0].programLevel}`;
+
+    const isConfirmed = window.confirm(
+      `Are you sure you want to remove workout ${workoutInfo}?`,
+    );
+    if (!isConfirmed) {
+      return;
+    }
     await pushupsRepository.removeWorkout(user, id);
     await loadData();
   };
@@ -267,7 +280,7 @@ export default function PushUpsApp() {
             key={program.seriesLevel}
             value={program.seriesLevel}
           >
-            {`seriesLevel ${program.seriesLevel} (${program.set1}+${program.set2}+${program.set3}+${program.set4}+${program.set5}=${program.total})`}
+            {`Level ${program.seriesLevel} (${program.set1}+${program.set2}+${program.set3}+${program.set4}+${program.set5}=${program.total})`}
           </option>
         ))}
       </select>
@@ -282,13 +295,13 @@ export default function PushUpsApp() {
           <div className='flex gap-2'>
             <button
               onClick={handleGiveUpSubmit}
-              className='h-14 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
+              className='h-12 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
             >
               Give up
             </button>
             <button
               onClick={startAgain}
-              className='h-14 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
+              className='h-12 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
             >
               Reset
             </button>
