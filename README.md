@@ -24,3 +24,8 @@ Regular updates will be provided to enhance the app's functionality and user exp
 Link for production version: https://ai-planner-2077.vercel.app
 
 ![image](https://github.com/user-attachments/assets/8e05ba09-fb95-43ef-adcb-0c1c1c407c13)
+
+## Push ups workout tracker
+
+![image](https://github.com/user-attachments/assets/0f9bfced-d93e-4e7e-b77e-7e88b65efc69)
+
