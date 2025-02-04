@@ -357,7 +357,7 @@ export default function PushUpsApp() {
         </div>
       )}
 
-      <Box className='flex flex-col w-full px-2'>
+      <Box className='flex flex-col w-full px-2 mt-6 h-96 overflow-y-auto'>
         <button
           className='flex px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded items-center gap-3 hover:bg-green-600 w-44'
           onClick={async () => await loadData()}
