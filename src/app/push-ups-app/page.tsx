@@ -285,14 +285,14 @@ export default function PushUpsApp() {
         ))}
       </select>
 
-      <h2 className='flex text-xl gap-3 mb-4 mt-4 p-4 border rounded-md bg-blue-600'>
+      <h2 className='flex text-xl gap-3 mb-4 mt-4 p-2 border rounded-md bg-blue-600'>
         <div>
           Set {currentSet}: Target Pushups: {targetPushups}{' '}
           <p>Break Time: {selectedProgram.breakTime} seconds</p>
           <p>Current total: {currentPushupsTotal}</p>
         </div>
         {remainingPushups !== 0 && (
-          <div className='flex gap-2'>
+          <div className='flex flex-col gap-1'>
             <button
               onClick={handleGiveUpSubmit}
               className='h-12 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
