@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { pushupsRepository } from '../repositories/pushups';
 import { FaArrowsRotate, FaDeleteLeft } from 'react-icons/fa6';
 import { levels } from '@/utils';
+import { Box } from '@mui/material';
 
 const programs = levels;
 
@@ -226,6 +227,7 @@ export default function PushUpsApp() {
   };
 
   const loadData = async () => {
+    // TODO: This should be used in middleware on loading app, preload all data inside redux store, until then it will have to laod it manualy from db
     const data = await pushupsRepository.getSeries(user);
     setData({ data: data.data, count: data.data.length });
   };
@@ -247,11 +249,8 @@ export default function PushUpsApp() {
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen p-4 pt-24 bg-cyan-900 bg-cover bg-[url("/images/pushups.webp")]'>
-      <h1 className='text-2xl font-bold mb-4'>
+      <h1 className='text-2xl font-bold mb-4 text-orange-400 bg-black p-2'>
         Push Ups Workout Tracker{' '}
-        <button className='my-4' onClick={async () => await loadData()}>
-          {<FaArrowsRotate />}
-        </button>
       </h1>
       <label htmlFor='programs' className='block text-lg font-medium mb-2'>
         Select Level:
@@ -280,12 +279,20 @@ export default function PushUpsApp() {
           <p>Current total: {currentPushupsTotal}</p>
         </div>
         {remainingPushups !== 0 && (
-          <button
-            onClick={handleGiveUpSubmit}
-            className='h-14 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
-          >
-            Give up
-          </button>
+          <div className='flex gap-2'>
+            <button
+              onClick={handleGiveUpSubmit}
+              className='h-14 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
+            >
+              Give up
+            </button>
+            <button
+              onClick={startAgain}
+              className='h-14 px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded hover:bg-green-600'
+            >
+              Reset
+            </button>
+          </div>
         )}
       </h2>
 
@@ -294,7 +301,7 @@ export default function PushUpsApp() {
           <button
             disabled={disabledForASecond}
             onClick={handlePushup}
-            className='w-80 h-80 px-6 py-2 border border-spacing-8 border-y-8 border-x-8 border-yellow-300 bg-blue-500 text-white shrink-0 grow-0 rounded-full hover:bg-blue-600'
+            className='w-80 h-80 px-6 py-2 border border-spacing-8 border-y-8 border-x-8 border-yellow-300 bg-blue-500 text-white shrink-0 grow-0 rounded-full hover:bg-blue-500'
           >
             <div className='text-9xl font-bold'>
               {remainingPushups === 0 ? (
@@ -309,7 +316,7 @@ export default function PushUpsApp() {
         <div className='flex flex-col items-center'>
           <button
             onClick={proceedToNextSet}
-            className='w-80 h-80 px-6 py-2 border border-y-8 border-x-8 border-blue-500 bg-yellow-500 text-white rounded-full hover:bg-yellow-600'
+            className='w-80 h-80 px-6 py-2 border border-y-8 border-x-8 border-blue-500 bg-yellow-500 text-white rounded-full hover:bg-yellow-500'
           >
             <h2 className='text-xl mb-4 text-cyan-950'>Break Time!</h2>
             <h2 className='text-8xl font-bold mb-6 text-cyan-950'>
@@ -337,43 +344,55 @@ export default function PushUpsApp() {
         </div>
       )}
 
-      <table className='w-full mt-8 border-collapse border-2 border-black text-1xl text-cyan-800 bg-slate-400'>
-        <thead className='bg-gray-300'>
-          <tr className='border-2 border-black'>
-            <th className='border-2 border-black px-4 py-2 text-left'>Date</th>
-            <th className='border-2 border-black px-4 py-2 text-left'>
-              Workout Level
-            </th>
-            <th className='border-2 border-black px-4 py-2 text-left'>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.data &&
-            data.data.map((row, index) => (
-              <tr key={index} className='border-2 border-black'>
-                <td className='border-2 border-black px-4 py-2'>
-                  {formatDate(new Date(row.date).toISOString())}
-                </td>
-                <td className='border-2 border-black px-4 py-2'>
-                  {`${row.programLevel} (${row.set1}+${row.set2}+${row.set3}+${row.set4}+${row.set5}=${row.set1 + row.set2 + row.set3 + row.set4 + row.set5})`}
-                </td>
-                <td className='border-2 border-black px-4 py-2'>
-                  <div className='flex items-center justify-between gap-2'>
-                    {row.total}
-                    {
-                      <FaDeleteLeft
-                        onClick={() => {
-                          removeWorkout(row.id);
-                        }}
-                        size={30}
-                      />
-                    }
-                  </div>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      <Box className='flex flex-col w-full px-2'>
+        <button
+          className='flex px-4 py-2 border border-black bg-green-300 text-cyan-800 text-xl rounded items-center gap-3 hover:bg-green-600 w-44'
+          onClick={async () => await loadData()}
+        >
+          {<FaArrowsRotate />}Get my data
+        </button>
+        <table className='w-full mt-8 border-collapse border-2 border-black text-1xl text-cyan-800 bg-slate-400'>
+          <thead className='bg-gray-300'>
+            <tr className='border-2 border-black'>
+              <th className='border-2 border-black px-4 py-2 text-left'>
+                Date
+              </th>
+              <th className='border-2 border-black px-4 py-2 text-left'>
+                Workout Level
+              </th>
+              <th className='border-2 border-black px-4 py-2 text-left'>
+                Total
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data?.data &&
+              data.data.map((row, index) => (
+                <tr key={index} className='border-2 border-black'>
+                  <td className='border-2 border-black px-4 py-2'>
+                    {formatDate(new Date(row.date).toISOString())}
+                  </td>
+                  <td className='border-2 border-black px-4 py-2'>
+                    {`${row.programLevel} (${row.set1}+${row.set2}+${row.set3}+${row.set4}+${row.set5}=${row.set1 + row.set2 + row.set3 + row.set4 + row.set5})`}
+                  </td>
+                  <td className='border-2 border-black px-4 py-2'>
+                    <div className='flex items-center justify-between gap-2'>
+                      {row.total}
+                      {
+                        <FaDeleteLeft
+                          onClick={() => {
+                            removeWorkout(row.id);
+                          }}
+                          size={30}
+                        />
+                      }
+                    </div>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </Box>
 
       <div className='flex gap-2 mt-3'>
         {/* <div>
