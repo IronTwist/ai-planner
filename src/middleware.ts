@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserInfo } from './session/server-sessions';
 
-export const protectedRoutes = ['/', '/dashboard', '/profile', '/notes'];
+export const protectedRoutes = [
+  '/',
+  '/dashboard',
+  '/profile',
+  '/notes',
+  '/push-ups-app',
+  'pushups',
+];
 
 export default async function middlewares(req: NextRequest) {
   let isLogedIn = false;
