@@ -1,10 +1,11 @@
 {
   "name": "Ai-planner",
   "short_name": "ai-planner",
-  "theme_color": "#00ff00",
+  "theme_color": "#2f2740",
   "background_color": "#ffffff",
-  "display": "standalone",
-  "orientation": "any",
+  "text_color": "#d0ccd9",
+  "display": "fullscreen",
+  "orientation": "portrait-primary",
   "scope": "/",
   "start_url": "/",
   "icons": [
