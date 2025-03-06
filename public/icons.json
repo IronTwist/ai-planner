@@ -1,12 +1,4 @@
 {
-  "name": "Ai-planner",
-  "short_name": "ai-planner",
-  "theme_color": "#00ff00",
-  "background_color": "#ffffff",
-  "display": "standalone",
-  "orientation": "any",
-  "scope": "/",
-  "start_url": "/",
   "icons": [
     {
       "src": "windows11/SmallTile.scale-100.png",
